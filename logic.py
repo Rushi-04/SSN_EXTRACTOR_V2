@@ -27,64 +27,6 @@ FOLDERS = [
 # COMPANY SELECTION CORE LOGIC
 # ==============================
 
-def get_company_config(selected_company: str):
-    """
-    Returns full configuration for selected company.
-
-    No UI logic included.
-    Exact same behaviour as original script.
-    """
-
-    if selected_company not in COMPANIES:
-        raise ValueError(
-            "Invalid company selection. "
-            "Available companies: " + ", ".join(COMPANIES)
-        )
-
-    # 1. ANTHEM_ABC_MUSGROW
-    if selected_company == "ANTHEM_ABC_MUSGROW":
-        base_path = os.path.join(ROOT_PATH, "ANTHEM_ABC_MUSGROW", "834s")
-        active_folders = FOLDERS
-
-    # 2. AHH_AMO
-    elif selected_company.startswith("AHH_AMO"):
-        base_path = os.path.join(ROOT_PATH, "AHH_AMO")
-        active_folders = [""]  # files directly inside
-
-    # 3. TELADOC
-    elif selected_company == "TELADOC":
-        base_path = os.path.join(ROOT_PATH, "TELADOC")
-        active_folders = ["MEI"]
-
-    # 4. SAVRX
-    elif selected_company == "SAVRX":
-        base_path = os.path.join(ROOT_PATH, "SAVRX")
-        active_folders = [
-            "480", "521", "J84", "L82",
-            "MEI", "OEW", "TRI", "TRI_NONMEDICARE"
-        ]
-
-    else:
-        raise ValueError(
-            "There is no SSN found for this company. "
-            "SSN available only for ANTHEM_ABC_MUSGROW and AHH_AMO"
-        )
-
-    # Boolean flags (exact same logic preserved)
-    is_ahh_amo = selected_company.startswith("AHH_AMO")
-    is_teladoc = selected_company == "TELADOC"
-    is_savrx = selected_company == "SAVRX"
-
-    return {
-        "selected_company": selected_company,
-        "base_path": base_path,
-        "active_folders": active_folders,
-        "is_ahh_amo": is_ahh_amo,
-        "is_teladoc": is_teladoc,
-        "is_savrx": is_savrx
-    }
-
-
 import re
 from datetime import datetime
 
@@ -1447,7 +1389,75 @@ def find_all_ssns_in_date_range_savrx(
     return sorted(ssns_found)
 
 
-# new logic for the subfolders dropdown*****************************************************
+# # new logic for the subfolders dropdown*****************************************************
+
+
+# # new logic for the subfolders dropdown*****************************************************
+# def get_company_config(selected_company: str, selected_subfolder: str | None = None):
+
+#     if selected_company not in COMPANIES:
+#         raise ValueError(
+#             "Invalid company selection. "
+#             "Available companies: " + ", ".join(COMPANIES)
+#         )
+
+#     # 1️ANTHEM
+#     if selected_company == "ANTHEM_ABC_MUSGROW":
+#         base_path = os.path.join(ROOT_PATH, "ANTHEM_ABC_MUSGROW", "834s")
+#         active_folders = FOLDERS.copy()
+
+#         if selected_subfolder and selected_subfolder in FOLDERS:
+#             active_folders = [selected_subfolder]
+
+#     # 2️AHH_AMO
+#     elif selected_company.startswith("AHH_AMO"):
+#         base_path = os.path.join(ROOT_PATH, "AHH_AMO")
+#         active_folders = [""]
+
+#     # 3️TELADOC
+#     elif selected_company == "TELADOC":
+#         base_path = os.path.join(ROOT_PATH, "TELADOC")
+#         active_folders = ["MEI"]
+
+#         if selected_subfolder == "MEI":
+#             active_folders = ["MEI"]
+
+#     # 4️SAVRX
+#     elif selected_company == "SAVRX":
+#         base_path = os.path.join(ROOT_PATH, "SAVRX")
+
+#         savrx_folders = [
+#             "480", "521", "J84", "L82",
+#             "MEI", "OEW", "TRI", "TRI_NONMEDICARE"
+#         ]
+
+#         active_folders = savrx_folders.copy()
+
+#         if selected_subfolder and selected_subfolder in savrx_folders:
+#             active_folders = [selected_subfolder]
+
+#     else:
+#         raise ValueError("Invalid company.")
+
+
+
+#     #VERY IMPORTANT (ADD BACK THESE FLAGS) *************************************
+#     is_ahh_amo = selected_company.startswith("AHH_AMO")
+#     is_teladoc = selected_company == "TELADOC"
+#     is_savrx = selected_company == "SAVRX"
+
+#     return {
+#         "selected_company": selected_company,
+#         "base_path": base_path,
+#         "active_folders": active_folders,
+#         "is_ahh_amo": is_ahh_amo,
+#         "is_teladoc": is_teladoc,
+#         "is_savrx": is_savrx
+#     }             
+
+
+# new logic 14-02-2026 for the subfolders dropdown*****************************************************
+
 def get_company_config(selected_company: str, selected_subfolder: str | None = None):
 
     if selected_company not in COMPANIES:
@@ -1456,49 +1466,65 @@ def get_company_config(selected_company: str, selected_subfolder: str | None = N
             "Available companies: " + ", ".join(COMPANIES)
         )
 
-    # 1. ANTHEM_ABC_MUSGROW
+    # 1️ANTHEM
     if selected_company == "ANTHEM_ABC_MUSGROW":
         base_path = os.path.join(ROOT_PATH, "ANTHEM_ABC_MUSGROW", "834s")
-        active_folders = FOLDERS.copy()
 
-        # NEW LOGIC (OPTIONAL SUBFOLDER FILTER)
-        if selected_subfolder and selected_subfolder in FOLDERS:
+        all_folders = FOLDERS.copy()
+        active_folders = all_folders
+
+        if selected_subfolder and selected_subfolder in all_folders:
             active_folders = [selected_subfolder]
 
-    # 2. AHH_AMO
-    elif selected_company.startswith("AHH_AMO"):
+    # 2️AHH_AMO  FIXED
+    elif selected_company == "AHH_AMO":
         base_path = os.path.join(ROOT_PATH, "AHH_AMO")
-        active_folders = [""]
 
-    # 3. TELADOC
+        # DEFINE SUBFOLDERS MANUALLY HERE
+        all_folders = [" "]   # <-- yahi show hoga dropdown me
+
+        active_folders = all_folders
+        if selected_subfolder and selected_subfolder in all_folders:
+            active_folders = [selected_subfolder]
+
+    # 3️TELADOC  
     elif selected_company == "TELADOC":
         base_path = os.path.join(ROOT_PATH, "TELADOC")
-        active_folders = ["MEI"]
 
-        if selected_subfolder == "MEI":
-            active_folders = ["MEI"]
+        # Already predefined
+        all_folders = ["MEI"]
 
-    # 4. SAVRX
+        active_folders = all_folders
+        if selected_subfolder and selected_subfolder in all_folders:
+            active_folders = [selected_subfolder]
+
+    # 4️SAVRX
     elif selected_company == "SAVRX":
         base_path = os.path.join(ROOT_PATH, "SAVRX")
-        savrx_folders = [
+
+        all_folders = [
             "480", "521", "J84", "L82",
             "MEI", "OEW", "TRI", "TRI_NONMEDICARE"
         ]
 
-        active_folders = savrx_folders.copy()
+        active_folders = all_folders
 
-        # OPTIONAL FILTER
-        if selected_subfolder and selected_subfolder in savrx_folders:
+        if selected_subfolder and selected_subfolder in all_folders:
             active_folders = [selected_subfolder]
 
     else:
-        raise ValueError(
-            "There is no SSN found for this company."
-        )
+        raise ValueError("Invalid company.")
+
+    # FLAGS (IMPORTANT)
+    is_ahh_amo = selected_company == "AHH_AMO"
+    is_teladoc = selected_company == "TELADOC"
+    is_savrx = selected_company == "SAVRX"
 
     return {
         "selected_company": selected_company,
         "base_path": base_path,
-        "active_folders": active_folders
+        "active_folders": active_folders,
+        "is_ahh_amo": is_ahh_amo,
+        "is_teladoc": is_teladoc,
+        "is_savrx": is_savrx
     }

@@ -691,8 +691,9 @@ body.light-mode #memberNamePageNumber{
 
 <div class="container">
 
+<!-- it is a old logic 13-02-2026 -->
 <!-- COMPANY -->
-<div class="card">
+<!-- <div class="card">
   <h2>Select Company</h2>
   <select id="company">
     <option>AHH_AMO</option>
@@ -701,7 +702,33 @@ body.light-mode #memberNamePageNumber{
     <option>SAVRX</option>
   </select>
   <button onclick="selectCompany()">Confirm Company</button>
+</div> -->
+
+
+<!-- it is a new logic 13-02-2026 -->
+<div class="card">
+  <h2>Select Company</h2>
+
+  <!-- COMPANY DROPDOWN -->
+  <select id="company" onchange="selectCompany()">
+    <option value="">Select Company</option>
+    <option>AHH_AMO</option>
+    <option>ANTHEM_ABC_MUSGROW</option>
+    <option>TELADOC</option>
+    <option>SAVRX</option>
+  </select>
+
+  <!-- SUBFOLDER DROPDOWN (OPTIONAL - HIDDEN DEFAULT) -->
+  <div id="subfolderWrapper" style="margin-top:15px; display:none;">
+    <select id="subfolder" onchange="selectSubfolder()">
+      <option value="">All Folders (Default)</option>
+    </select>
+  </div>
+
 </div>
+
+
+
 
 <!-- SEARCH -->
 <div class="card">
@@ -954,13 +981,61 @@ function renderAbsentDates(){
     `Page ${absentPage} of ${Math.ceil(absentDatesData.length / pageSize)}`;
 }
 
+// it is a old logic 13-02-2026***************************************
 
+// // -------------------- COMPANY --------------------
+// async function selectCompany(){
+//   const res = await pywebview.api.select_company(company.value);
+//   alert(res.success ? "Company selected successfully." : res.error);
+// }
 
+// it is a new logic 13-02-2026***************************************
 // -------------------- COMPANY --------------------
 async function selectCompany(){
-  const res = await pywebview.api.select_company(company.value);
-  alert(res.success ? "Company selected successfully." : res.error);
+
+  const selectedCompany = document.getElementById("company").value;
+
+  if(!selectedCompany){
+      return;
+  }
+
+  const res = await pywebview.api.select_company(selectedCompany);
+
+  if(!res.success){
+      alert(res.error);
+      return;
+  }
+
+  // Show subfolder dropdown if folders available
+  const subWrapper = document.getElementById("subfolderWrapper");
+  const subSelect = document.getElementById("subfolder");
+
+  subSelect.innerHTML = `<option value="">All Folders (Default)</option>`;
+
+  if(res.subfolders && res.subfolders.length >= 1){
+
+      res.subfolders.forEach(folder=>{
+          subSelect.innerHTML += `<option value="${folder}">${folder}</option>`;
+      });
+
+      subWrapper.style.display = "block";
+
+  } else {
+      subWrapper.style.display = "none";
+  }
 }
+
+async function selectSubfolder(){
+
+  const folder = document.getElementById("subfolder").value;
+
+  const res = await pywebview.api.select_subfolder(folder);
+
+  if(!res.success){
+      alert(res.error);
+  }
+}
+
 
 
 // new logic logic for SSN*******************************************11/02/2026*******************
