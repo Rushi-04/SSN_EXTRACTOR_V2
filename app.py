@@ -6,7 +6,7 @@ class API:
 
     def __init__(self):
         self.company = None
-        self.subfolder = None   # ✅ NEW
+        self.subfolder = None  
         self.config = None
 
 
@@ -41,7 +41,7 @@ class API:
         try:
             self.subfolder = subfolder_name if subfolder_name else None
 
-            # 🔥 Rebuild config with optional subfolder
+            # Rebuild config with optional subfolder
             self.config = get_company_config(self.company, self.subfolder)
 
             return {"success": True}
@@ -50,9 +50,9 @@ class API:
             return {"success": False, "error": str(e)}
 
 
-    # ================================
-    # SSN SEARCH
-    # ================================
+# ssn extraction new logic 14-02-2026****************
+# new logic 14-02-2026****************      
+
     def search_by_ssn(self, ssn):
 
         if not self.config:
@@ -67,35 +67,33 @@ class API:
         IS_SAVRX = self.config["is_savrx"]
 
         if IS_AHH_AMO:
-            present_dates, all_dates = find_ssn_all_dates_ahh_amo(BASE_PATH, ssn)
+            present, absent = find_ssn_all_dates_ahh_amo(BASE_PATH, ssn)
         elif IS_TELADOC:
-            present_dates, all_dates = find_ssn_all_dates_teladoc(BASE_PATH, ACTIVE_FOLDERS, ssn)
+            present, absent = find_ssn_all_dates_teladoc(BASE_PATH, ACTIVE_FOLDERS, ssn)
         elif IS_SAVRX:
-            present_dates, all_dates = find_ssn_all_dates_savrx(BASE_PATH, ACTIVE_FOLDERS, ssn)
+            present, absent = find_ssn_all_dates_savrx(BASE_PATH, ACTIVE_FOLDERS, ssn)
         else:
-            present_dates, all_dates = find_ssn_all_dates(BASE_PATH, ACTIVE_FOLDERS, ssn)
+            present, absent = find_ssn_all_dates(BASE_PATH, ACTIVE_FOLDERS, ssn)
 
-        present_dates = sorted(present_dates, key=lambda d: safe_parse_date(d))
-        all_dates = sorted(all_dates, key=lambda d: safe_parse_date(d))
-
-        if not present_dates:
+        if not present:
             return {"success": False, "error": "SSN not found."}
+        
+        summary = generate_ssn_timeline_summary(present, absent)
 
-        absent_dates = sorted(set(all_dates) - set(present_dates))
 
         return {
             "success": True,
             "ssn": ssn,
-            "present_dates": present_dates,
-            "absent_dates": absent_dates,
-            "from": present_dates[0],
-            "to": present_dates[-1]
+            "present_records": present,
+            "absent_records": absent,
+            "from": present[0]["date"],
+            "to": present[-1]["date"],
+            "summary": summary 
         }
 
 
-    # ================================
-    # MEMBER ID SEARCH
-    # ================================
+# member id search new logic 14-02-2026****************
+# new logic 14-02-2026****************
     def search_by_member_id(self, member_id):
 
         if not self.config:
@@ -110,31 +108,33 @@ class API:
         IS_SAVRX = self.config["is_savrx"]
 
         if IS_AHH_AMO:
-            dates, _ = find_member_id_all_dates_ahh_amo(BASE_PATH, member_id)
+            present, absent = find_member_id_all_dates_ahh_amo(BASE_PATH, member_id)
         elif IS_TELADOC:
-            dates, _ = find_member_id_all_dates_teladoc(BASE_PATH, ACTIVE_FOLDERS, member_id)
+            present, absent = find_member_id_all_dates_teladoc(BASE_PATH, ACTIVE_FOLDERS, member_id)
         elif IS_SAVRX:
-            dates, _ = find_member_id_all_dates_savrx(BASE_PATH, ACTIVE_FOLDERS, member_id)
+            present, absent = find_member_id_all_dates_savrx(BASE_PATH, ACTIVE_FOLDERS, member_id)
         else:
-            dates = find_member_id_all_dates(BASE_PATH, ACTIVE_FOLDERS, member_id)
+            present, absent = find_member_id_all_dates(BASE_PATH, ACTIVE_FOLDERS, member_id)
 
-        dates = sorted(dates, key=lambda d: safe_parse_date(d))
-
-        if not dates:
+        if not present:
             return {"success": False, "error": "Member ID not found."}
+
+        summary = generate_member_id_timeline_summary(present, absent)
 
         return {
             "success": True,
             "member_id": member_id,
-            "dates": dates,
-            "from": dates[0],
-            "to": dates[-1]
+            "present_records": present,
+            "absent_records": absent,
+            "from": present[0]["date"],
+            "to": present[-1]["date"],
+            "summary": summary
+
         }
 
 
-    # ================================
-    # MEMBER NAME SEARCH
-    # ================================
+# member name search new logic 14-02-2026****************
+    # member name search new logic 14-02-2026****************
     def search_by_member_name(self, member_name):
 
         if not self.config:
@@ -149,26 +149,26 @@ class API:
         IS_SAVRX = self.config["is_savrx"]
 
         if IS_AHH_AMO:
-            dates, _ = find_member_name_all_dates_ahh_amo(BASE_PATH, member_name)
+            present, absent = find_member_name_all_dates_ahh_amo(BASE_PATH, member_name)
         elif IS_TELADOC:
-            dates, _ = find_member_name_all_dates_teladoc(BASE_PATH, ACTIVE_FOLDERS, member_name)
+            present, absent = find_member_name_all_dates_teladoc(BASE_PATH, ACTIVE_FOLDERS, member_name)
         elif IS_SAVRX:
-            dates, _ = find_member_name_all_dates_savrx(BASE_PATH, ACTIVE_FOLDERS, member_name)
+            present, absent = find_member_name_all_dates_savrx(BASE_PATH, ACTIVE_FOLDERS, member_name)
         else:
-            dates = find_member_name_all_dates(BASE_PATH, ACTIVE_FOLDERS, member_name)
+            present, absent = find_member_name_all_dates(BASE_PATH, ACTIVE_FOLDERS, member_name)
 
-        dates = sorted(dates, key=lambda d: safe_parse_date(d))
-
-        if not dates:
+        if not present:
             return {"success": False, "error": "Member Name not found."}
 
         return {
             "success": True,
             "member_name": member_name,
-            "dates": dates,
-            "from": dates[0],
-            "to": dates[-1]
+            "present_records": present,
+            "absent_records": absent,
+            "from": present[0]["date"],
+            "to": present[-1]["date"]
         }
+
 
 
     # ================================

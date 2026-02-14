@@ -84,6 +84,7 @@ def extract_date_ahh_amo(filename):
     return f"{mm}-{dd}-20{yy}"
 
 
+
 # ---------------------------------
 # Company 2: ANTHEM_ABC_MUSGROW
 # ---------------------------------
@@ -115,6 +116,15 @@ def extract_date(filename, folder):
 
     if date.isdigit():
         yy, mm, dd = date[0:2], date[2:4], date[4:6]
+        
+        # Fix: Handle YYDDMM format where MM > 12
+        if int(mm) > 12 and int(dd) <= 12:
+            mm, dd = dd, mm
+        
+        # Validate date
+        if int(mm) < 1 or int(mm) > 12 or int(dd) < 1 or int(dd) > 31:
+            return None
+
         return f"{mm}-{dd}-20{yy}"
 
     # ---- SPECIAL TRI_MED LOGIC (unchanged) ----
@@ -128,7 +138,16 @@ def extract_date(filename, folder):
                     chunk = part[i:i+6]
                     if chunk.isdigit():
                         yy, mm, dd = chunk[0:2], chunk[2:4], chunk[4:6]
-                        return f"{mm}-{dd}-20{yy}"
+                        
+                        # Fix: Handle YYDDMM
+                        if int(mm) > 12 and int(dd) <= 12:
+                            mm, dd = dd, mm
+                        
+                        # Validate
+                        if int(mm) < 1 or int(mm) > 12 or int(dd) < 1 or int(dd) > 31:
+                            pass # check next chunk
+                        else:
+                            return f"{mm}-{dd}-20{yy}"
     except Exception:
         pass
 
@@ -499,8 +518,42 @@ def is_date_in_range(file_date, start_date, end_date):
 # Company 1: ANTHEM_ABC_MUSGROW
 # ---------------------------------
 
+# def find_member_id_all_dates(base_path, folders, target_member_id, debug=False):
+#     found_dates = []
+
+#     for folder in folders:
+#         if debug:
+#             print("Searching Folder :", folder)
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+#             if debug:
+#                 print("Checking file:", file)
+
+#             if not file.endswith(".834"):
+#                 continue
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             if (
+#                 f"REF*OF*{target_member_id}~" in content
+#                 or f"REF*ABB*{target_member_id}~" in content
+#             ):
+#                 date = extract_date(file, folder)
+#                 found_dates.append(date)
+
+#     return sorted(found_dates)
+
+# NEW LOGIC 14-02-2026******************************************************
 def find_member_id_all_dates(base_path, folders, target_member_id, debug=False):
-    found_dates = []
+    present_records = []
+    absent_records = []
 
     for folder in folders:
         if debug:
@@ -511,10 +564,12 @@ def find_member_id_all_dates(base_path, folders, target_member_id, debug=False):
             continue
 
         for file in os.listdir(backup_path):
-            if debug:
-                print("Checking file:", file)
 
             if not file.endswith(".834"):
+                continue
+
+            date = extract_date(file, folder)
+            if not date:
                 continue
 
             file_path = os.path.join(backup_path, file)
@@ -522,23 +577,96 @@ def find_member_id_all_dates(base_path, folders, target_member_id, debug=False):
             with open(file_path, "r", errors="ignore") as f:
                 content = f.read()
 
+            # Original matching logic untouched
             if (
                 f"REF*OF*{target_member_id}~" in content
                 or f"REF*ABB*{target_member_id}~" in content
             ):
-                date = extract_date(file, folder)
-                found_dates.append(date)
+                present_records.append({
+                    "date": date,
+                    "filename": file
+                })
+            else:
+                absent_records.append({
+                    "date": date,
+                    "filename": file
+                })
 
-    return sorted(found_dates)
+            if debug:
+                print("---------------------------------------------------")
+
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+        )
+    )
 
 
-# ---------------------------------
-# Company 2: AHH_AMO
-# ---------------------------------
 
+# # ---------------------------------
+# # Company 2: AHH_AMO
+# # ---------------------------------
+
+# def find_member_id_all_dates_ahh_amo(base_path, target_member_id, debug=False):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     backup_path = os.path.join(base_path, "backups")
+
+#     if debug:
+#         print("Backup Path :", backup_path)
+
+#     if not os.path.exists(backup_path):
+#         return [], []
+
+#     # Flexible REF pattern (exact same as original)
+#     member_id_pattern = re.compile(
+#         rf"REF\*(0F|ABB)\*{re.escape(target_member_id)}(\*|~|\b)",
+#         re.IGNORECASE
+#     )
+
+#     for file in os.listdir(backup_path):
+
+#         if debug:
+#             print("Checking file for Member ID:", file)
+
+#         if not file.lower().endswith((".txt", ".834")):
+#             continue
+
+#         date = extract_date_ahh_amo(file)
+#         if date:
+#             all_file_dates.add(date)
+
+#         file_path = os.path.join(backup_path, file)
+
+#         with open(file_path, "r", errors="ignore") as f:
+#             content = f.read()
+
+#         if member_id_pattern.search(content):
+
+#             if debug:
+#                 print("Member ID match found:", target_member_id)
+#                 print("File:", file)
+#                 print("Extracted date:", date)
+
+#             if date:
+#                 found_dates.append(date)
+
+#         if debug:
+#             print("-------------------------------------")
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+
+# new logic 14-02-2026******************************************************
 def find_member_id_all_dates_ahh_amo(base_path, target_member_id, debug=False):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     backup_path = os.path.join(base_path, "backups")
 
@@ -548,7 +676,6 @@ def find_member_id_all_dates_ahh_amo(base_path, target_member_id, debug=False):
     if not os.path.exists(backup_path):
         return [], []
 
-    # Flexible REF pattern (exact same as original)
     member_id_pattern = re.compile(
         rf"REF\*(0F|ABB)\*{re.escape(target_member_id)}(\*|~|\b)",
         re.IGNORECASE
@@ -562,43 +689,117 @@ def find_member_id_all_dates_ahh_amo(base_path, target_member_id, debug=False):
         if not file.lower().endswith((".txt", ".834")):
             continue
 
+        # SAME DATE EXTRACTION (no skip)
         date = extract_date_ahh_amo(file)
-        if date:
-            all_file_dates.add(date)
 
         file_path = os.path.join(backup_path, file)
 
         with open(file_path, "r", errors="ignore") as f:
             content = f.read()
 
-        if member_id_pattern.search(content):
+        found = False
 
+        if member_id_pattern.search(content):
             if debug:
                 print("Member ID match found:", target_member_id)
                 print("File:", file)
                 print("Extracted date:", date)
 
-            if date:
-                found_dates.append(date)
+            found = True
+
+        record = {
+            "date": date,  # can be None
+            "filename": file
+        }
+
+        if found:
+            present_records.append(record)
+        else:
+            absent_records.append(record)
 
         if debug:
             print("-------------------------------------")
 
-    return sorted(found_dates), sorted(all_file_dates)
+    # Safe date sorting (no skip if date is None)
+    def safe_sort(records):
+        return sorted(
+            records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+
+    return (
+        safe_sort(present_records),
+        safe_sort(absent_records)
+    )
 
 
-# ---------------------------------
-# Company 3: TELADOC
-# ---------------------------------
 
+# # ---------------------------------
+# # Company 3: TELADOC
+# # ---------------------------------
+
+# def find_member_id_all_dates_teladoc(
+#     base_path,
+#     folders,
+#     target_member_id,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     # Exact same regex (unchanged)
+#     member_id_pattern = re.compile(
+#         rf"REF\*(0F|OF|ABB)\*{re.escape(target_member_id)}~",
+#         re.IGNORECASE
+#     )
+
+#     for folder in folders:
+
+#         if debug:
+#             print(f"Searching in Folder : {folder}")
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print(f"Searching in File : {file}")
+#                 print("-" * 95)
+
+#             if not file.endswith(".834"):
+#                 continue
+
+#             # ---- DATE EXTRACTION ----
+#             date = extract_date_teladoc(file)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             # Count occurrences (same behaviour)
+#             matches = member_id_pattern.findall(content)
+#             match_count = len(matches)
+
+#             if match_count > 0:
+#                 if date:
+#                     found_dates.append(date)
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+# new logic 14-02-2026******************************************************
 def find_member_id_all_dates_teladoc(
     base_path,
     folders,
     target_member_id,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     # Exact same regex (unchanged)
     member_id_pattern = re.compile(
@@ -624,30 +825,110 @@ def find_member_id_all_dates_teladoc(
             if not file.endswith(".834"):
                 continue
 
-            # ---- DATE EXTRACTION ----
+            # ---- DATE EXTRACTION (unchanged) ----
             date = extract_date_teladoc(file)
-            if date:
-                all_file_dates.add(date)
 
             file_path = os.path.join(backup_path, file)
 
             with open(file_path, "r", errors="ignore") as f:
                 content = f.read()
 
-            # Count occurrences (same behaviour)
+            # ---- COUNT MATCHES (unchanged behaviour) ----
             matches = member_id_pattern.findall(content)
             match_count = len(matches)
 
+            record = {
+                "date": date,
+                "filename": file
+            }
+
             if match_count > 0:
-                if date:
-                    found_dates.append(date)
+                present_records.append(record)
+            else:
+                absent_records.append(record)
 
-    return sorted(found_dates), sorted(all_file_dates)
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
 
 
-# ---------------------------------
-# Company 4: SAVRX
-# ---------------------------------
+# # ---------------------------------
+# # Company 4: SAVRX
+# # ---------------------------------
+
+# def find_member_id_all_dates_savrx(
+#     base_path,
+#     folders,
+#     target_member_id,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     # Exact flexible REF logic (unchanged)
+#     member_id_pattern = re.compile(
+#         rf"REF\*(0F|OF|ABB)\*{re.escape(target_member_id)}(\*|~|\b)",
+#         re.IGNORECASE
+#     )
+
+#     for folder in folders:
+
+#         if debug:
+#             print(f"\nSearching in Folder : {folder}")
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+
+#         if debug:
+#             print(backup_path)
+
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print(f"Searching in file : {file}")
+#                 print("-" * 72)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             # ---- DATE EXTRACTION (Folder-wise) ----
+#             date = extract_date_savrx(folder, file)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             # ---- MEMBER ID MATCH COUNT ----
+#             matches = member_id_pattern.findall(content)
+#             match_count = len(matches)
+
+#             if match_count > 0:
+
+#                 if debug:
+#                     print(
+#                         f"Member ID {target_member_id} found "
+#                         f"{match_count} times in file : {file}"
+#                     )
+
+#                 # date added only once per file (same behaviour)
+#                 if date:
+#                     found_dates.append(date)
+
+#             if debug:
+#                 print("------------------------------------------------")
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+# new logic : 14-02-2026********************************************************
 
 def find_member_id_all_dates_savrx(
     base_path,
@@ -655,8 +936,8 @@ def find_member_id_all_dates_savrx(
     target_member_id,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     # Exact flexible REF logic (unchanged)
     member_id_pattern = re.compile(
@@ -688,14 +969,17 @@ def find_member_id_all_dates_savrx(
             with open(file_path, "r", errors="ignore") as f:
                 content = f.read()
 
-            # ---- DATE EXTRACTION (Folder-wise) ----
+            # ---- DATE EXTRACTION (unchanged) ----
             date = extract_date_savrx(folder, file)
-            if date:
-                all_file_dates.add(date)
 
-            # ---- MEMBER ID MATCH COUNT ----
+            # ---- MEMBER ID MATCH COUNT (unchanged behaviour) ----
             matches = member_id_pattern.findall(content)
             match_count = len(matches)
+
+            record = {
+                "date": date,
+                "filename": file
+            }
 
             if match_count > 0:
 
@@ -705,14 +989,24 @@ def find_member_id_all_dates_savrx(
                         f"{match_count} times in file : {file}"
                     )
 
-                # date added only once per file (same behaviour)
-                if date:
-                    found_dates.append(date)
+                present_records.append(record)
+            else:
+                absent_records.append(record)
 
             if debug:
                 print("------------------------------------------------")
 
-    return sorted(found_dates), sorted(all_file_dates)
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
+
 
 
 # ==============================
@@ -726,13 +1020,60 @@ MEMBER_NAME_PATTERN = re.compile(r"NM1\*IL\*1\*(.+?)\*{3,}")
 # Company 1: ANTHEM_ABC_MUSGROW
 # ---------------------------------
 
+# def find_member_name_all_dates(
+#     base_path,
+#     folders,
+#     target_member_name,
+#     debug=False
+# ):
+#     found_dates = []
+
+#     for folder in folders:
+
+#         if debug:
+#             print(f"Searching in Folder : {folder}")
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print(f"Checking in File : {file}")
+
+#             if not file.endswith(".834"):
+#                 continue
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             matches = MEMBER_NAME_PATTERN.findall(content)
+
+#             for name in matches:
+#                 clean_name = name.replace("*", " ").strip()
+
+#                 if clean_name.upper() == target_member_name.upper():
+#                     date = extract_date(file, folder)
+#                     if date:
+#                         found_dates.append(date)
+
+#     return sorted(found_dates)
+
+
+# MEMBER NAME LOGIC : 14-02-2026**********************************************
 def find_member_name_all_dates(
     base_path,
     folders,
     target_member_name,
     debug=False
 ):
-    found_dates = []
+    present_records = []
+    absent_records = []
+
+    target_name = target_member_name.upper().strip()
 
     for folder in folders:
 
@@ -745,10 +1086,11 @@ def find_member_name_all_dates(
 
         for file in os.listdir(backup_path):
 
-            if debug:
-                print(f"Checking in File : {file}")
-
             if not file.endswith(".834"):
+                continue
+
+            date = extract_date(file, folder)
+            if not date:
                 continue
 
             file_path = os.path.join(backup_path, file)
@@ -758,28 +1100,114 @@ def find_member_name_all_dates(
 
             matches = MEMBER_NAME_PATTERN.findall(content)
 
+            found = False
+
+            # Original matching behaviour preserved
             for name in matches:
                 clean_name = name.replace("*", " ").strip()
 
-                if clean_name.upper() == target_member_name.upper():
-                    date = extract_date(file, folder)
-                    if date:
-                        found_dates.append(date)
+                if clean_name.upper() == target_name:
+                    found = True
+                    break
 
-    return sorted(found_dates)
+            if found:
+                present_records.append({
+                    "date": date,
+                    "filename": file
+                })
+            else:
+                absent_records.append({
+                    "date": date,
+                    "filename": file
+                })
+
+            if debug:
+                print("---------------------------------------------------")
+
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+        )
+    )
+
 
 
 # ---------------------------------
 # Company 2: AHH_AMO
 # ---------------------------------
 
+# def find_member_name_all_dates_ahh_amo(
+#     base_path,
+#     target_member_name,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     backup_path = os.path.join(base_path, "backups")
+
+#     if debug:
+#         print("Backup Path :", backup_path)
+
+#     if not os.path.exists(backup_path):
+#         return [], []
+
+#     target_name = target_member_name.upper().strip()
+
+#     for file in os.listdir(backup_path):
+
+#         if debug:
+#             print("Checking file for Member Name:", file)
+
+#         if not file.lower().endswith((".txt", ".834")):
+#             continue
+
+#         date = extract_date_ahh_amo(file)
+#         if date:
+#             all_file_dates.add(date)
+
+#         file_path = os.path.join(backup_path, file)
+
+#         with open(file_path, "r", errors="ignore") as f:
+#             content = f.read()
+
+#         matches = MEMBER_NAME_PATTERN.findall(content)
+
+#         for raw_name in matches:
+#             clean_name = raw_name.replace("*", " ").strip()
+
+#             if clean_name.upper() == target_name:
+
+#                 if debug:
+#                     print("Member Name match found:", target_member_name)
+#                     print("File:", file)
+#                     print("Extracted date:", date)
+
+#                 if date:
+#                     found_dates.append(date)
+
+#         if debug:
+#             print("-------------------------------------")
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+
+# new logic 14-02-2026******************************************************
+
 def find_member_name_all_dates_ahh_amo(
     base_path,
     target_member_name,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
+
+    target_name = target_member_name.upper().strip()
 
     backup_path = os.path.join(base_path, "backups")
 
@@ -788,8 +1216,6 @@ def find_member_name_all_dates_ahh_amo(
 
     if not os.path.exists(backup_path):
         return [], []
-
-    target_name = target_member_name.upper().strip()
 
     for file in os.listdir(backup_path):
 
@@ -800,8 +1226,6 @@ def find_member_name_all_dates_ahh_amo(
             continue
 
         date = extract_date_ahh_amo(file)
-        if date:
-            all_file_dates.add(date)
 
         file_path = os.path.join(backup_path, file)
 
@@ -810,28 +1234,89 @@ def find_member_name_all_dates_ahh_amo(
 
         matches = MEMBER_NAME_PATTERN.findall(content)
 
+        found = False
+
         for raw_name in matches:
             clean_name = raw_name.replace("*", " ").strip()
 
             if clean_name.upper() == target_name:
+                found = True
+                break
 
-                if debug:
-                    print("Member Name match found:", target_member_name)
-                    print("File:", file)
-                    print("Extracted date:", date)
-
-                if date:
-                    found_dates.append(date)
+        if found:
+            present_records.append({
+                "date": date,
+                "filename": file
+            })
+        else:
+            absent_records.append({
+                "date": date,
+                "filename": file
+            })
 
         if debug:
             print("-------------------------------------")
 
-    return sorted(found_dates), sorted(all_file_dates)
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
 
 
-# ---------------------------------
-# Company 3: TELADOC
-# ---------------------------------
+
+# # ---------------------------------
+# # Company 3: TELADOC
+# # ---------------------------------
+
+# def find_member_name_all_dates_teladoc(
+#     base_path,
+#     folders,
+#     target_member_name,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     target_name = target_member_name.upper().strip()
+
+#     for folder in folders:
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if not file.endswith(".834"):
+#                 continue
+
+#             date = extract_date_teladoc(file)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             matches = MEMBER_NAME_PATTERN.findall(content)
+
+#             for raw_name in matches:
+#                 clean_name = raw_name.replace("*", " ").strip()
+
+#                 if clean_name.upper() == target_name:
+#                     if date:
+#                         found_dates.append(date)
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+# new logic 14-02-2026******************************************************
 
 def find_member_name_all_dates_teladoc(
     base_path,
@@ -839,8 +1324,8 @@ def find_member_name_all_dates_teladoc(
     target_member_name,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     target_name = target_member_name.upper().strip()
 
@@ -856,8 +1341,6 @@ def find_member_name_all_dates_teladoc(
                 continue
 
             date = extract_date_teladoc(file)
-            if date:
-                all_file_dates.add(date)
 
             file_path = os.path.join(backup_path, file)
 
@@ -866,28 +1349,118 @@ def find_member_name_all_dates_teladoc(
 
             matches = MEMBER_NAME_PATTERN.findall(content)
 
+            found = False
+
             for raw_name in matches:
                 clean_name = raw_name.replace("*", " ").strip()
 
                 if clean_name.upper() == target_name:
-                    if date:
-                        found_dates.append(date)
+                    found = True
+                    break
 
-    return sorted(found_dates), sorted(all_file_dates)
+            record = {
+                "date": date,
+                "filename": file
+            }
+
+            if found:
+                present_records.append(record)
+            else:
+                absent_records.append(record)
+
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
 
 
-# ---------------------------------
-# Company 4: SAVRX
-# ---------------------------------
 
+# # ---------------------------------
+# # Company 4: SAVRX
+# # ---------------------------------
+
+# def find_member_name_all_dates_savrx(
+#     base_path,
+#     folders,
+#     target_member_name,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     # normalize input (unchanged behaviour)
+#     target_name = target_member_name.upper().strip()
+
+#     for folder in folders:
+
+#         if debug:
+#             print(f"\nSearching in Folder : {folder}")
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print(f"Searching in file : {file}")
+#                 print("-" * 72)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             # read ALL file types (unchanged behaviour)
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             # ---- DATE EXTRACTION (SAVRX folder-wise) ----
+#             date = extract_date_savrx(folder, file)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             # ---- MEMBER NAME MATCH COUNT ----
+#             matches = MEMBER_NAME_PATTERN.findall(content)
+#             match_count = 0
+
+#             for raw_name in matches:
+#                 clean_name = raw_name.replace("*", " ").strip()
+
+#                 if clean_name.upper() == target_name:
+#                     match_count += 1
+
+#             if match_count > 0:
+
+#                 if debug:
+#                     print(
+#                         f"Member Name '{target_member_name}' found "
+#                         f"{match_count} times in file : {file}"
+#                     )
+
+#                 # date added only once per file (same behaviour)
+#                 if date:
+#                     found_dates.append(date)
+
+#             if debug:
+#                 print("------------------------------------------------")
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+
+# new logic : 14-02-2026********************************************************
 def find_member_name_all_dates_savrx(
     base_path,
     folders,
     target_member_name,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     # normalize input (unchanged behaviour)
     target_name = target_member_name.upper().strip()
@@ -914,12 +1487,10 @@ def find_member_name_all_dates_savrx(
             with open(file_path, "r", errors="ignore") as f:
                 content = f.read()
 
-            # ---- DATE EXTRACTION (SAVRX folder-wise) ----
+            # ---- DATE EXTRACTION (unchanged) ----
             date = extract_date_savrx(folder, file)
-            if date:
-                all_file_dates.add(date)
 
-            # ---- MEMBER NAME MATCH COUNT ----
+            # ---- MEMBER NAME MATCH COUNT (unchanged) ----
             matches = MEMBER_NAME_PATTERN.findall(content)
             match_count = 0
 
@@ -929,6 +1500,11 @@ def find_member_name_all_dates_savrx(
                 if clean_name.upper() == target_name:
                     match_count += 1
 
+            record = {
+                "date": date,
+                "filename": file
+            }
+
             if match_count > 0:
 
                 if debug:
@@ -937,14 +1513,26 @@ def find_member_name_all_dates_savrx(
                         f"{match_count} times in file : {file}"
                     )
 
-                # date added only once per file (same behaviour)
-                if date:
-                    found_dates.append(date)
+                present_records.append(record)
+            else:
+                absent_records.append(record)
 
             if debug:
                 print("------------------------------------------------")
 
-    return sorted(found_dates), sorted(all_file_dates)
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
+
+
+
 
 
 # ==============================
@@ -957,18 +1545,87 @@ SSN_PATTERN = re.compile(
 )
 
 
-# ---------------------------------
-# Company 1: ANTHEM_ABC_MUSGROW
-# ---------------------------------
+# # ---------------------------------
+# # Company 1: ANTHEM_ABC_MUSGROW
+# # ---------------------------------
 
+# def find_ssn_all_dates(
+#     base_path,
+#     folders,
+#     target_ssn,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     for folder in folders:
+
+#         if debug:
+#             print("Searching in folder:", folder)
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print("Checking file for SSN:", file)
+
+#             if not file.endswith(".834"):
+#                 continue
+
+#             # Collect ALL file dates
+#             date = extract_date(file, folder)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             matches = SSN_PATTERN.findall(content)
+
+#             file_match_count = 0
+#             date_printed = False
+
+#             for ssn in matches:
+#                 if ssn == target_ssn:
+#                     file_match_count += 1
+
+#                     # Add date only once per file
+#                     if not date_printed:
+#                         if debug:
+#                             print("SSN match found:", ssn)
+#                             print("Extracted date:", date)
+
+#                         if date:
+#                             found_dates.append(date)
+
+#                         date_printed = True
+
+#             if file_match_count > 0 and debug:
+#                 print(
+#                     f"Total match found for that particular file is : "
+#                     f"{file_match_count}"
+#                 )
+
+#             if debug:
+#                 print("---------------------------------------------------")
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+
+# new logic 14-02-2026**********************************
 def find_ssn_all_dates(
     base_path,
     folders,
     target_ssn,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     for folder in folders:
 
@@ -981,16 +1638,12 @@ def find_ssn_all_dates(
 
         for file in os.listdir(backup_path):
 
-            if debug:
-                print("Checking file for SSN:", file)
-
             if not file.endswith(".834"):
                 continue
 
-            # Collect ALL file dates
             date = extract_date(file, folder)
-            if date:
-                all_file_dates.add(date)
+            if not date:
+                continue
 
             file_path = os.path.join(backup_path, file)
 
@@ -999,47 +1652,91 @@ def find_ssn_all_dates(
 
             matches = SSN_PATTERN.findall(content)
 
-            file_match_count = 0
-            date_printed = False
-
-            for ssn in matches:
-                if ssn == target_ssn:
-                    file_match_count += 1
-
-                    # Add date only once per file
-                    if not date_printed:
-                        if debug:
-                            print("SSN match found:", ssn)
-                            print("Extracted date:", date)
-
-                        if date:
-                            found_dates.append(date)
-
-                        date_printed = True
-
-            if file_match_count > 0 and debug:
-                print(
-                    f"Total match found for that particular file is : "
-                    f"{file_match_count}"
-                )
+            # If SSN present
+            if target_ssn in matches:
+                present_records.append({
+                    "date": date,
+                    "filename": file
+                })
+            else:
+                absent_records.append({
+                    "date": date,
+                    "filename": file
+                })
 
             if debug:
                 print("---------------------------------------------------")
 
-    return sorted(found_dates), sorted(all_file_dates)
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+        )
+    )
 
 
-# ---------------------------------
-# Company 2: AHH_AMO
-# ---------------------------------
+# # ---------------------------------
+# # Company 2: AHH_AMO
+# # ---------------------------------
 
+# def find_ssn_all_dates_ahh_amo(
+#     base_path,
+#     target_ssn,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     backup_path = os.path.join(base_path, "backups")
+
+#     if not os.path.exists(backup_path):
+#         return [], []
+
+#     for file in os.listdir(backup_path):
+
+#         if debug:
+#             print("Checking file for SSN:", file)
+
+#         # No file extension restriction (same behaviour)
+
+#         date = extract_date_ahh_amo(file)
+#         if date:
+#             all_file_dates.add(date)
+
+#         file_path = os.path.join(backup_path, file)
+
+#         with open(file_path, "r", errors="ignore") as f:
+#             content = f.read()
+
+#         matches = SSN_PATTERN.findall(content)
+
+#         if target_ssn in matches:
+
+#             if debug:
+#                 print("SSN match found:", target_ssn)
+#                 print("File:", file)
+#                 print("Extracted date:", date)
+
+#             if date:
+#                 found_dates.append(date)
+
+#         if debug:
+#             print("-------------------------------------")
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+# new logic 14-02-2026******************************************************
 def find_ssn_all_dates_ahh_amo(
     base_path,
     target_ssn,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     backup_path = os.path.join(base_path, "backups")
 
@@ -1051,11 +1748,9 @@ def find_ssn_all_dates_ahh_amo(
         if debug:
             print("Checking file for SSN:", file)
 
-        # No file extension restriction (same behaviour)
+        # Same behaviour: no extension restriction
 
         date = extract_date_ahh_amo(file)
-        if date:
-            all_file_dates.add(date)
 
         file_path = os.path.join(backup_path, file)
 
@@ -1064,6 +1759,8 @@ def find_ssn_all_dates_ahh_amo(
 
         matches = SSN_PATTERN.findall(content)
 
+        found = False
+
         if target_ssn in matches:
 
             if debug:
@@ -1071,27 +1768,91 @@ def find_ssn_all_dates_ahh_amo(
                 print("File:", file)
                 print("Extracted date:", date)
 
-            if date:
-                found_dates.append(date)
+            found = True
+
+        record = {
+            "date": date,
+            "filename": file
+        }
+
+        if found:
+            present_records.append(record)
+        else:
+            absent_records.append(record)
 
         if debug:
             print("-------------------------------------")
 
-    return sorted(found_dates), sorted(all_file_dates)
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
 
 
-# ---------------------------------
-# Company 3: TELADOC
-# ---------------------------------
 
+# # ---------------------------------
+# # Company 3: TELADOC
+# # ---------------------------------
+
+# def find_ssn_all_dates_teladoc(
+#     base_path,
+#     folders,
+#     target_ssn,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     for folder in folders:
+
+#         if debug:
+#             print(f"Searching in Folder : {folder}")
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print(f"Checking file : {file}")
+
+#             if not file.endswith(".834"):
+#                 continue
+
+#             date = extract_date_teladoc(file)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             matches = SSN_PATTERN.findall(content)
+
+#             # Same behaviour: append date if SSN present
+#             if target_ssn in matches and date:
+#                 found_dates.append(date)
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+
+#  new logic 14-02-2026******************************************************
 def find_ssn_all_dates_teladoc(
     base_path,
     folders,
     target_ssn,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     for folder in folders:
 
@@ -1111,8 +1872,6 @@ def find_ssn_all_dates_teladoc(
                 continue
 
             date = extract_date_teladoc(file)
-            if date:
-                all_file_dates.add(date)
 
             file_path = os.path.join(backup_path, file)
 
@@ -1121,16 +1880,97 @@ def find_ssn_all_dates_teladoc(
 
             matches = SSN_PATTERN.findall(content)
 
-            # Same behaviour: append date if SSN present
-            if target_ssn in matches and date:
-                found_dates.append(date)
+            record = {
+                "date": date,
+                "filename": file
+            }
 
-    return sorted(found_dates), sorted(all_file_dates)
+            if target_ssn in matches:
+                present_records.append(record)
+            else:
+                absent_records.append(record)
+
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
 
 
-# ---------------------------------
-# Company 4: SAVRX
-# ---------------------------------
+
+# # ---------------------------------
+# # Company 4: SAVRX
+# # ---------------------------------
+
+# def find_ssn_all_dates_savrx(
+#     base_path,
+#     folders,
+#     target_ssn,
+#     debug=False
+# ):
+#     found_dates = []
+#     all_file_dates = set()
+
+#     for folder in folders:
+
+#         if debug:
+#             print(f"\nSearching in Folder : {folder}")
+
+#         backup_path = os.path.join(base_path, folder, "backups")
+
+#         if debug:
+#             print(backup_path)
+
+#         if not os.path.exists(backup_path):
+#             continue
+
+#         for file in os.listdir(backup_path):
+
+#             if debug:
+#                 print(f"Searching in file : {file}")
+#                 print("-" * 72)
+
+#             # NO extension restriction (unchanged behaviour)
+
+#             # ---- DATE EXTRACTION (Folder-wise) ----
+#             date = extract_date_savrx(folder, file)
+#             if date:
+#                 all_file_dates.add(date)
+
+#             file_path = os.path.join(backup_path, file)
+
+#             with open(file_path, "r", errors="ignore") as f:
+#                 content = f.read()
+
+#             matches = SSN_PATTERN.findall(content)
+
+#             file_match_count = 0
+#             date_added = False
+
+#             for ssn in matches:
+#                 if ssn == target_ssn:
+#                     file_match_count += 1
+
+#                     # add date only once per file
+#                     if not date_added and date:
+#                         found_dates.append(date)
+#                         date_added = True
+
+#             if file_match_count > 0 and debug:
+#                 print(
+#                     f"SSN {target_ssn} found "
+#                     f"{file_match_count} times in file : {file}"
+#                 )
+
+#     return sorted(found_dates), sorted(all_file_dates)
+
+
+# new logic : 14-02-2026************************************************
 
 def find_ssn_all_dates_savrx(
     base_path,
@@ -1138,8 +1978,8 @@ def find_ssn_all_dates_savrx(
     target_ssn,
     debug=False
 ):
-    found_dates = []
-    all_file_dates = set()
+    present_records = []
+    absent_records = []
 
     for folder in folders:
 
@@ -1160,12 +2000,8 @@ def find_ssn_all_dates_savrx(
                 print(f"Searching in file : {file}")
                 print("-" * 72)
 
-            # NO extension restriction (unchanged behaviour)
-
-            # ---- DATE EXTRACTION (Folder-wise) ----
+            # ---- DATE EXTRACTION (unchanged) ----
             date = extract_date_savrx(folder, file)
-            if date:
-                all_file_dates.add(date)
 
             file_path = os.path.join(backup_path, file)
 
@@ -1181,18 +2017,34 @@ def find_ssn_all_dates_savrx(
                 if ssn == target_ssn:
                     file_match_count += 1
 
-                    # add date only once per file
-                    if not date_added and date:
-                        found_dates.append(date)
+                    if not date_added:
                         date_added = True
 
-            if file_match_count > 0 and debug:
-                print(
-                    f"SSN {target_ssn} found "
-                    f"{file_match_count} times in file : {file}"
-                )
+            record = {
+                "date": date,
+                "filename": file
+            }
 
-    return sorted(found_dates), sorted(all_file_dates)
+            if file_match_count > 0:
+                if debug:
+                    print(
+                        f"SSN {target_ssn} found "
+                        f"{file_match_count} times in file : {file}"
+                    )
+                present_records.append(record)
+            else:
+                absent_records.append(record)
+
+    return (
+        sorted(
+            present_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        ),
+        sorted(
+            absent_records,
+            key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y") if x["date"] else datetime.min
+        )
+    )
 
 
 # ==============================
@@ -1528,3 +2380,186 @@ def get_company_config(selected_company: str, selected_subfolder: str | None = N
         "is_teladoc": is_teladoc,
         "is_savrx": is_savrx
     }
+
+
+# new logic for conclusion 14-02-2026*********************************************
+#********************************************************************************* 
+
+def generate_ssn_timeline_summary(present_records, absent_records):
+
+    if not present_records and not absent_records:
+        return "No records found."
+
+    # Collect all dates with state
+    all_dates = {}
+
+    for r in present_records:
+        if r["date"]:
+            all_dates[r["date"]] = "present"
+
+    for r in absent_records:
+        if r["date"] and r["date"] not in all_dates:
+            all_dates[r["date"]] = "absent"
+
+    if not all_dates:
+        return "No valid dated records found."
+
+    # Sort all dates chronologically
+    try:
+        sorted_dates = sorted(
+            all_dates.keys(),
+            key=lambda d: datetime.strptime(d, "%m-%d-%Y")
+        )
+    except Exception:
+        # Fallback if sorting fails (though extract_date should prevent this)
+        sorted_dates = sorted(all_dates.keys())
+
+    summary_parts = []
+    
+    current_state = None
+    missing_block = []
+
+    # Helper to add event
+    def add_event(text, type="info"):
+        summary_parts.append(f"<li class='summary-{type}'>{text}</li>")
+
+    for idx, date in enumerate(sorted_dates):
+        state = all_dates[date]
+
+        # FIRST ENTRY
+        if idx == 0:
+            if state == "present":
+                add_event(f"Started on <b>{date}</b>", "success")
+            else:
+                missing_block = [date]
+            current_state = state
+            continue
+
+        # SAME STATE CONTINUE
+        if state == current_state:
+            if state == "absent":
+                missing_block.append(date)
+            continue
+
+        # STATE CHANGE: PRESENT → ABSENT
+        if current_state == "present" and state == "absent":
+            missing_block = [date]
+            current_state = "absent"
+            continue
+
+        # STATE CHANGE: ABSENT → PRESENT
+        if current_state == "absent" and state == "present":
+            # Flush missing block
+            if missing_block:
+                count = len(missing_block)
+                dates_str = ", ".join(missing_block) if count < 5 else f"{missing_block[0]} ... {missing_block[-1]} ({count} dates)"
+                add_event(f"Missing: {dates_str}", "warning")
+            
+            add_event(f"Restarted on <b>{date}</b>", "success")
+
+            missing_block = []
+            current_state = "present"
+            continue
+
+    # If ended in absent
+    if current_state == "absent" and missing_block:
+        count = len(missing_block)
+        dates_str = ", ".join(missing_block) if count < 5 else f"{missing_block[0]} ... {missing_block[-1]} ({count} dates)"
+        add_event(f"Ends with Missing: {dates_str}", "danger")
+
+    # Show last present regardless of current state
+    if present_records:
+        try:
+            last_present = max(
+                present_records,
+                key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+            )["date"]
+            add_event(f"Last Present Date: <b>{last_present}</b>", "info")
+        except:
+            pass
+
+    return f"<ul class='timeline-list'>{''.join(summary_parts)}</ul>"
+
+
+# new logic for member id**********14-02-2026*******************************************
+# **************************************************************************************
+
+def generate_member_id_timeline_summary(present_records, absent_records):
+    # Reuse the same logic, just label tweaks if needed, but the structure is generic enough
+    # For now, I'll copy the logic to ensure distinct behavior if requested later.
+    
+    if not present_records and not absent_records:
+        return "No records found."
+
+    all_dates = {}
+    for r in present_records:
+        if r["date"]: all_dates[r["date"]] = "present"
+    for r in absent_records:
+        if r["date"] and r["date"] not in all_dates: all_dates[r["date"]] = "absent"
+
+    if not all_dates:
+        return "No valid dated records found."
+
+    try:
+        sorted_dates = sorted(
+            all_dates.keys(),
+            key=lambda d: datetime.strptime(d, "%m-%d-%Y")
+        )
+    except Exception:
+        sorted_dates = sorted(all_dates.keys())
+
+    summary_parts = []
+    current_state = None
+    missing_block = []
+
+    def add_event(text, type="info"):
+        summary_parts.append(f"<li class='summary-{type}'>{text}</li>")
+
+    for idx, date in enumerate(sorted_dates):
+        state = all_dates[date]
+
+        if idx == 0:
+            if state == "present":
+                add_event(f"Member ID Started on <b>{date}</b>", "success")
+            else:
+                missing_block = [date]
+            current_state = state
+            continue
+
+        if state == current_state:
+            if state == "absent": missing_block.append(date)
+            continue
+
+        if current_state == "present" and state == "absent":
+            missing_block = [date]
+            current_state = "absent"
+            continue
+
+        if current_state == "absent" and state == "present":
+            if missing_block:
+                count = len(missing_block)
+                dates_str = ", ".join(missing_block) if count < 5 else f"{missing_block[0]} ... {missing_block[-1]} ({count} dates)"
+                add_event(f"Missing: {dates_str}", "warning")
+            
+            add_event(f"Restarted on <b>{date}</b>", "success")
+            missing_block = []
+            current_state = "present"
+            continue
+
+    if current_state == "absent" and missing_block:
+        count = len(missing_block)
+        dates_str = ", ".join(missing_block) if count < 5 else f"{missing_block[0]} ... {missing_block[-1]} ({count} dates)"
+        add_event(f"Ends with Missing: {dates_str}", "danger")
+
+    if present_records:
+        try:
+            last_present = max(
+                present_records,
+                key=lambda x: datetime.strptime(x["date"], "%m-%d-%Y")
+            )["date"]
+            add_event(f"Last Present Date: <b>{last_present}</b>", "info")
+        except:
+            pass
+
+    return f"<ul class='timeline-list'>{''.join(summary_parts)}</ul>"
+

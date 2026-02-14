@@ -1,251 +1,342 @@
-  <!DOCTYPE html>
-  <html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 
-  <head>
-    <meta charset="UTF-8">
-    <title>834 Eligibility Search System</title>
+<head>
+  <meta charset="UTF-8">
+  <title>834 Eligibility Search System</title>
 
-    <style>
-      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-      * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: "Inter", system-ui, -apple-system, sans-serif;
-      }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+    }
 
-      body {
-        background: #0F172A;
-        color: #E2E8F0;
-        min-height: 100vh;
-      }
+    body {
+      background: #0F172A;
+      color: #E2E8F0;
+      min-height: 100vh;
+    }
 
-      /* HEADER */
-      header {
-        background: #1E293B;
-        padding: 16px 24px;
-        border-bottom: 1px solid #334155;
-      }
+    /* HEADER */
+    header {
+      background: #1E293B;
+      padding: 16px 24px;
+      border-bottom: 1px solid #334155;
+    }
 
-      header h1 {
-        font-size: 15px;
-        font-weight: 700;
-        color: #F1F5F9;
-        letter-spacing: .3px;
-      }
+    header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #F1F5F9;
+      letter-spacing: .3px;
+    }
 
-      header p {
-        font-size: 11px;
-        color: #64748B;
-        margin-top: 2px;
-      }
+    header p {
+      font-size: 11px;
+      color: #64748B;
+      margin-top: 2px;
+    }
 
-      /* LAYOUT */
-      .container {
-        max-width: 480px;
-        margin: 0 auto;
-        padding: 28px 20px;
-      }
+    /* LAYOUT */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
 
-      /* SECTION LABELS */
-      .section-label {
-        font-size: 11px;
-        font-weight: 600;
-        color: #64748B;
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
-      }
+    /* SINGLE ROW SEARCH */
+    .search-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+      margin-bottom: 24px;
+      /* removed card styles */
+    }
 
-      /* FORM ELEMENTS */
-      label {
-        display: block;
-        font-size: 12px;
-        font-weight: 500;
-        color: #94A3B8;
-        margin-bottom: 4px;
-      }
+    .search-col {
+      flex: 1;
+    }
 
-      select,
-      input[type="text"],
-      input:not([type="hidden"]) {
-        width: 100%;
-        padding: 9px 12px;
-        border-radius: 6px;
-        border: 1px solid #334155;
-        font-size: 13px;
-        background: #1E293B;
-        color: #E2E8F0;
-        outline: none;
-        transition: border-color .2s, box-shadow .2s;
-      }
+    .search-col-btn {
+      flex: 0 0 auto;
+    }
 
-      select {
-        appearance: none;
-        -webkit-appearance: none;
-        cursor: pointer;
-        background-image: url("data:image/svg+xml;utf8,<svg fill='%2394A3B8' height='16' viewBox='0 0 20 20' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>");
-        background-repeat: no-repeat;
-        background-position: right 10px center;
-        padding-right: 32px;
-      }
+    /* Force label to be single line and truncate if needed */
+    .search-col label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-      select option {
-        background: #1E293B;
-        color: #E2E8F0;
-      }
+    /* SECTION LABELS */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
 
-      input:focus,
-      select:focus {
-        border-color: #6366F1;
-        box-shadow: 0 0 0 2px rgba(99, 102, 241, .2);
-      }
+    /* FORM ELEMENTS */
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #94A3B8;
+      margin-bottom: 4px;
+    }
 
-      input::placeholder {
-        color: #475569;
-      }
+    select,
+    input[type="text"],
+    input:not([type="hidden"]) {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      font-size: 13px;
+      background: #1E293B;
+      color: #E2E8F0;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
 
-      /* SPACING BETWEEN FORM ROWS */
-      .form-row {
-        margin-bottom: 14px;
-      }
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%2394A3B8' height='16' viewBox='0 0 20 20' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 32px;
+    }
 
-      /* BUTTON */
-      button {
-        padding: 9px 20px;
-        border-radius: 6px;
-        border: none;
-        font-size: 13px;
-        font-weight: 600;
-        cursor: pointer;
-        background: #4F46E5;
-        color: #fff;
-        transition: background .2s;
-      }
+    select option {
+      background: #1E293B;
+      color: #E2E8F0;
+    }
 
-      button:hover {
-        background: #4338CA;
-      }
+    input:focus,
+    select:focus {
+      border-color: #6366F1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, .2);
+    }
 
-      button.secondary {
-        background: #0F766E;
-      }
+    input::placeholder {
+      color: #475569;
+    }
 
-      button.secondary:hover {
-        background: #115E59;
-      }
+    /* SPACING BETWEEN FORM ROWS */
+    .form-row {
+      margin-bottom: 14px;
+    }
 
-      /* DIVIDER */
-      .divider {
-        border: none;
-        border-top: 1px solid #1E293B;
-        margin: 24px 0;
-      }
+    /* BUTTON */
+    button {
+      padding: 9px 20px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #4F46E5;
+      color: #fff;
+      transition: background .2s;
+    }
 
-      /* RESULT */
-      .result {
-        display: none;
-        margin-top: 18px;
-        padding: 14px;
-        background: #1E293B;
-        border-radius: 8px;
-        border: 1px solid #334155;
-        font-size: 13px;
-      }
+    button:hover {
+      background: #4338CA;
+    }
 
-      .result b {
-        color: #A5B4FC;
-      }
+    button.secondary {
+      background: #0F766E;
+    }
 
-      /* BADGE */
-      .badge {
-        display: inline-block;
-        padding: 4px 10px;
-        margin: 3px;
-        border-radius: 4px;
-        background: #312E81;
-        color: #C7D2FE;
-        font-size: 12px;
-        font-weight: 500;
-      }
+    button.secondary:hover {
+      background: #115E59;
+    }
 
-      /* PAGE BUTTON */
-      .page-btn {
-        padding: 6px 14px;
-        border-radius: 6px;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        font-size: 12px;
-        background: #4F46E5;
-        color: #fff;
-      }
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid #1E293B;
+      margin: 24px 0;
+    }
 
-      .page-btn:hover {
-        background: #4338CA;
-      }
+    /* RESULT */
+    .result {
+      display: none;
+      margin-top: 18px;
+      /* removed card styles */
+    }
 
-      /* TOGGLE BUTTON (absent dates) */
-      .btn-toggle {
-        padding: 7px 16px;
-        border-radius: 6px;
-        border: none;
-        font-size: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        background: #334155;
-        color: #E2E8F0;
-      }
+    .result b {
+      color: #A5B4FC;
+    }
 
-      .btn-toggle:hover {
-        background: #475569;
-      }
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      margin: 3px;
+      border-radius: 4px;
+      background: #312E81;
+      color: #C7D2FE;
+      font-size: 12px;
+      font-weight: 500;
+    }
 
-      /* DATE RANGE GRID */
-      .date-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-      }
+    /* PAGE BUTTON */
+    .page-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      background: #4F46E5;
+      color: #fff;
+    }
 
-      /* FOOTER */
-      footer {
-        text-align: center;
-        padding: 18px;
-        font-size: 11px;
-        color: #475569;
-        border-top: 1px solid #1E293B;
-      }
+    .page-btn:hover {
+      background: #4338CA;
+    }
 
-      /* SCROLLBAR */
-      ::-webkit-scrollbar {
-        width: 6px;
-      }
+    /* TOGGLE BUTTON (absent dates) */
+    .btn-toggle {
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #334155;
+      color: #E2E8F0;
+    }
 
-      ::-webkit-scrollbar-thumb {
-        background: #334155;
-        border-radius: 3px;
-      }
+    .btn-toggle:hover {
+      background: #475569;
+    }
 
-      ::-webkit-scrollbar-track {
-        background: #0F172A;
-      }
-    </style>
+    /* DATE RANGE GRID */
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-  </head>
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 18px;
+      font-size: 11px;
+      color: #475569;
+      border-top: 1px solid #1E293B;
+    }
 
-  <body>
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
 
-    <header>
-      <h1>834 Eligibility Search System</h1>
-      <!-- <p>Enterprise Enrollment Audit Tool</p> -->
-    </header>
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
 
-    <div class="container">
+    ::-webkit-scrollbar-track {
+      background: #0F172A;
+    }
+
+    /* TIMELINE SUMMARY LIST */
+    .timeline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .timeline-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .timeline-list li:last-child {
+      border-bottom: none;
+    }
+
+    .timeline-list li b {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .summary-success {
+      color: #4ADE80;
+    }
+
+    /* Green */
+    .summary-warning {
+      color: #FACC15;
+    }
+
+    /* Yellow */
+    .summary-danger {
+      color: #F87171;
+    }
+
+    /* Red */
+    .summary-info {
+      color: #A5B4FC;
+    }
+
+    /* Indigo */
+
+    /* SIMPLE GRID TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      border: 1px solid #475569;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px;
+      font-weight: 600;
+      color: #E2E8F0;
+      background: #334155;
+      border: 1px solid #475569;
+      font-size: 12px;
+    }
+
+    td {
+      padding: 8px;
+      border: 1px solid #475569;
+      color: #CBD5E1;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+    <h1>834 Eligibility Search System</h1>
+    <!-- <p>Enterprise Enrollment Audit Tool</p> -->
+  </header>
+
+  <div class="container">
+
+    <!-- SINGLE ROW SEARCH UI -->
+    <div class="search-row">
 
       <!-- COMPANY -->
-      <div class="form-row">
+      <div class="search-col">
         <label>Company</label>
         <select id="company" onchange="selectCompany()">
           <option value="">Select Company</option>
@@ -256,16 +347,16 @@
         </select>
       </div>
 
-      <!-- SUBFOLDER (OPTIONAL) -->
-      <div id="subfolderWrapper" class="form-row" style="display:none;">
-        <label>Subfolder (Optional)</label>
+      <!-- SUBFOLDER (Always Visible) -->
+      <div class="search-col" id="subfolderWrapper">
+        <label>Subfolder</label>
         <select id="subfolder" onchange="selectSubfolder()">
           <option value="">All Folders (Default)</option>
         </select>
       </div>
 
       <!-- SEARCH TYPE -->
-      <div class="form-row">
+      <div class="search-col">
         <label>Search Type</label>
         <select id="searchType" onchange="updateSearchPlaceholder()">
           <option value="ssn">SSN</option>
@@ -275,46 +366,50 @@
       </div>
 
       <!-- SEARCH INPUT -->
-      <div class="form-row">
+      <div class="search-col" style="flex: 1.5;">
         <label id="searchInputLabel">Enter SSN</label>
         <input id="searchInput" placeholder="277110696">
       </div>
 
       <!-- SEARCH BUTTON -->
-      <button onclick="executeSearch()">Search</button>
-
-      <!-- HIDDEN INPUTS (backward compatibility) -->
-      <input type="hidden" id="ssn">
-      <input type="hidden" id="memberId">
-      <input type="hidden" id="memberName">
-
-      <!-- SEARCH RESULT -->
-      <div id="searchResult" class="result"></div>
-
-      <hr class="divider">
-
-      <!-- DATE RANGE -->
-      <div class="section-label">Date Range → All SSNs</div>
-
-      <div class="date-grid" style="margin-bottom:14px;">
-        <div>
-          <label>Start Date (DD-MM-YYYY)</label>
-          <input id="startDate">
-        </div>
-        <div>
-          <label>End Date (DD-MM-YYYY)</label>
-          <input id="endDate">
-        </div>
+      <div class="search-col-btn">
+        <button onclick="executeSearch()" style="height: 38px; padding: 0 30px;">Search</button>
       </div>
-
-      <button class="secondary" onclick="searchDateRange()">Find SSNs</button>
-      <div id="rangeResult" class="result"></div>
 
     </div>
 
+    <!-- HIDDEN INPUTS (backward compatibility) -->
+    <input type="hidden" id="ssn">
+    <input type="hidden" id="memberId">
+    <input type="hidden" id="memberName">
+
+    <!-- SEARCH RESULT -->
+    <div id="searchResult" class="result"></div>
+
+    <hr class="divider">
+
+    <!-- DATE RANGE
+    <div class="section-label">Date Range → All SSNs</div>
+
+    <div class="date-grid" style="margin-bottom:14px;">
+      <div>
+        <label>Start Date (DD-MM-YYYY)</label>
+        <input id="startDate">
+      </div>
+      <div>
+        <label>End Date (DD-MM-YYYY)</label>
+        <input id="endDate">
+      </div>
+    </div>
+
+    <button class="secondary" onclick="searchDateRange()">Find SSNs</button>
+    <div id="rangeResult" class="result"></div>
+
+  </div> -->
+
     <!-- <footer>
-      &copy; 2026 &middot; Healthcare Eligibility Automation Platform
-    </footer> -->
+    &copy; 2026 &middot; Healthcare Eligibility Automation Platform
+  </footer> -->
 
     <script>
 
@@ -345,6 +440,12 @@
       let currentRangeData = [];
 
 
+      // 14-02-2026
+      let ssnTablePage = 1;
+      let ssnTableData = [];
+      let ssnTableTitle = "";
+
+
 
       // new date ssn range logic date : 13-02-2026** 13:29
       function renderRangeTable(data = null) {
@@ -357,78 +458,78 @@
         const pageItems = currentRangeData.slice(start, end);
 
         let tableHTML = `
-      <div style="margin-top:20px;margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
-          <input id="rangeSearchInput" 
-                placeholder="Search SSN..."
-                style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:white;font-size:14px;">
+    <div style="margin-top:20px;margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
+        <input id="rangeSearchInput" 
+               placeholder="Search SSN..."
+               style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:white;font-size:14px;">
 
-          <button class="page-btn" onclick="filterRangeSSN()">
-              Search
-          </button>
+        <button class="page-btn" onclick="filterRangeSSN()">
+            Search
+        </button>
 
-          <button class="page-btn" onclick="resetRangeSearch()">
-              Cancel
-          </button>
-      </div>
+        <button class="page-btn" onclick="resetRangeSearch()">
+            Cancel
+        </button>
+    </div>
 
-      <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;">
-        <thead>
-          <tr style="background:linear-gradient(135deg,#4F46E5,#7C3AED);color:white;">
-            <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">#</th>
-            <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">SSN</th>
-          </tr>
-        </thead>
-        <tbody>
-    `;
+    <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;">
+      <thead>
+        <tr style="background:linear-gradient(135deg,#4F46E5,#7C3AED);color:white;">
+          <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">#</th>
+          <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">SSN</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
         if (pageItems.length === 0) {
           tableHTML += `
-          <tr>
-              <td colspan="2" style="padding:15px;text-align:center;">
-                  No SSN Found
-              </td>
-          </tr>
-        `;
+        <tr>
+            <td colspan="2" style="padding:15px;text-align:center;">
+                No SSN Found
+            </td>
+        </tr>
+      `;
         }
 
         pageItems.forEach((ssn, index) => {
           tableHTML += `
-        <tr style="text-align:center;background:rgba(255,255,255,.03);">
-          <td style="padding:8px;border:1px solid rgba(255,255,255,.08);">
-            ${start + index + 1}
-          </td>
-          <td style="padding:8px;border:1px solid rgba(255,255,255,.08);font-weight:600;">
-            ${ssn}
-          </td>
-        </tr>
-      `;
+      <tr style="text-align:center;background:rgba(255,255,255,.03);">
+        <td style="padding:8px;border:1px solid rgba(255,255,255,.08);">
+          ${start + index + 1}
+        </td>
+        <td style="padding:8px;border:1px solid rgba(255,255,255,.08);font-weight:600;">
+          ${ssn}
+        </td>
+      </tr>
+    `;
         });
 
         tableHTML += `
-        </tbody>
-      </table>
+      </tbody>
+    </table>
 
-      <div style="margin-top:15px;display:flex;justify-content:center;align-items:center;gap:15px;">
-        <button class="page-btn"
-          onclick="if(rangePage>1){rangePage--;renderRangeTable(currentRangeData);}">
-          Previous
-        </button>
+    <div style="margin-top:15px;display:flex;justify-content:center;align-items:center;gap:15px;">
+      <button class="page-btn"
+        onclick="if(rangePage>1){rangePage--;renderRangeTable(currentRangeData);}">
+        Previous
+      </button>
 
-        <span style="font-weight:600;">
-          Page ${rangePage} of ${Math.ceil(currentRangeData.length / rangePageSize)}
-        </span>
+      <span style="font-weight:600;">
+        Page ${rangePage} of ${Math.ceil(currentRangeData.length / rangePageSize)}
+      </span>
 
-        <button class="page-btn"
-          onclick="if(rangePage<Math.ceil(currentRangeData.length/rangePageSize)){rangePage++;renderRangeTable(currentRangeData);}">
-          Next
-        </button>
-      </div>
-    `;
+      <button class="page-btn"
+        onclick="if(rangePage<Math.ceil(currentRangeData.length/rangePageSize)){rangePage++;renderRangeTable(currentRangeData);}">
+        Next
+      </button>
+    </div>
+  `;
 
         document.getElementById("rangeResult").innerHTML = `
-        <div><b>Total Unique SSNs:</b> ${currentRangeData.length}</div>
-        ${tableHTML}
-    `;
+      <div><b>Total Unique SSNs:</b> ${currentRangeData.length}</div>
+      ${tableHTML}
+  `;
       }
 
 
@@ -543,10 +644,10 @@
             subSelect.innerHTML += `<option value="${folder}">${folder}</option>`;
           });
 
-          subWrapper.style.display = "block";
+          // subWrapper.style.display = "block"; // Always visible now
 
         } else {
-          subWrapper.style.display = "none";
+          // subWrapper.style.display = "none"; // Always visible now
         }
       }
 
@@ -604,242 +705,334 @@
 
 
 
-      // -------------------- SSN SEARCH --------------------
+      //     // -------------------- SSN SEARCH --------------------
 
+      //     async function searchSSN() {
+      //       const box = searchResult;
+      //       box.style.display = "block";
+      //       box.innerHTML = "Searching...";
+
+      //       const res = await pywebview.api.search_by_ssn(ssn.value);
+      //       if (!res.success) { box.innerHTML = res.error; return; }
+
+      //       const absentHTML = res.absent_dates && res.absent_dates.length
+      //         ? `
+      //   <div style="margin-top:14px">
+      //     <button class="btn-toggle" onclick="toggleAbsentDates()" id="absentBtn">
+      //       Show Absent Dates
+      //     </button>
+      //   </div>
+
+      //   <div id="absentSection" style="display:none;margin-top:15px">
+      //     <div id="absentDatesBox"></div>
+
+      //     <div style="margin-top:10px; display:flex; gap:10px; align-items:center; ">
+      //     <button onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
+
+      //       <span id="absentPageNumber"></span>
+      //       <button onclick="if(absentPage<Math.ceil(absentDatesData.length/pageSize)){absentPage++;renderAbsentDates()}">Next</button>
+      //     </div>
+      //   </div>
+      // `
+      //         : "";
+
+      //       box.innerHTML = `
+      //   <div style="
+      //       background:#1E293B;
+      //       padding:16px;
+      //       border-radius:8px;
+      //       margin-bottom:14px;
+      //   ">
+
+      //       <div style="font-size:12px;font-weight:600;color:#A5B4FC;margin-bottom:4px;">
+      //         SSN
+      //       </div>
+
+      //       <div style="font-size:20px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
+      //         ${res.ssn}
+      //       </div>
+
+      //       <div style="font-weight:600;margin-bottom:8px;color:#C7D2FE;font-size:13px;">
+      //         Present On Dates
+      //       </div>
+
+
+      // <div style="margin-bottom:14px;">
+      //   <div id="presentDatesContainer"></div>
+
+      //   <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+      //     <button style="color:white;" onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
+      //     <span id="presentPageNumber"></span>
+      //     <button style="color:white;" onclick="if(presentPage<Math.ceil(presentDatesData.length/pageSize)){presentPage++;renderPresentDates()}">Next</button>
+      //   </div>
+      // </div>
+
+
+      //       <div style="
+      //         background:rgba(99,102,241,.12);
+      //         padding:10px 12px;
+      //         border-radius:6px;
+      //         font-size:13px;
+      //         line-height:1.6;
+      //         border-left:3px solid #6366F1;
+      //       ">
+      //         <div><b>Present From:</b> ${res.from}</div>
+      //         <div><b>To:</b> ${res.to}</div>
+      //         <div style="margin-top:4px;">
+      //           <b>Last Present On Date:</b> ${res.to}
+      //         </div>
+      //       </div>
+
+      //   </div>
+
+      //   ${absentHTML}
+      // `;
+
+      //       // INIT PAGINATION DATA
+      //       presentDatesData = res.present_dates.slice().sort((a, b) => new Date(a) - new Date(b));
+      //       absentDatesData = res.absent_dates ? res.absent_dates.slice().sort((a, b) => new Date(a) - new Date(b)) : [];
+
+      //       presentPage = 1;
+      //       absentPage = 1;
+
+      //       renderPresentDates();
+
+
+
+      //     }
+
+
+      // new logic 14-02-2026**********************************************************
       async function searchSSN() {
+
         const box = searchResult;
         box.style.display = "block";
         box.innerHTML = "Searching...";
 
         const res = await pywebview.api.search_by_ssn(ssn.value);
-        if (!res.success) { box.innerHTML = res.error; return; }
 
-        const absentHTML = res.absent_dates && res.absent_dates.length
-          ? `
-    <div style="margin-top:14px">
-      <button class="btn-toggle" onclick="toggleAbsentDates()" id="absentBtn">
-        Show Absent Dates
-      </button>
-    </div>
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
 
-    <div id="absentSection" style="display:none;margin-top:15px">
-      <div id="absentDatesBox"></div>
-
-      <div style="margin-top:10px; display:flex; gap:10px; align-items:center; ">
-      <button onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
-
-        <span id="absentPageNumber"></span>
-        <button onclick="if(absentPage<Math.ceil(absentDatesData.length/pageSize)){absentPage++;renderAbsentDates()}">Next</button>
-      </div>
-    </div>
-  `
-          : "";
-
-        box.innerHTML = `
-    <div style="
-        background:#1E293B;
-        padding:16px;
-        border-radius:8px;
-        margin-bottom:14px;
-    ">
-
-        <div style="font-size:12px;font-weight:600;color:#A5B4FC;margin-bottom:4px;">
-          SSN
-        </div>
-
-        <div style="font-size:20px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
-          ${res.ssn}
-        </div>
-
-        <div style="font-weight:600;margin-bottom:8px;color:#C7D2FE;font-size:13px;">
-          Present On Dates
-        </div>
-
-
-  <div style="margin-bottom:14px;">
-    <div id="presentDatesContainer"></div>
-
-    <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-      <button style="color:white;" onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
-      <span id="presentPageNumber"></span>
-      <button style="color:white;" onclick="if(presentPage<Math.ceil(presentDatesData.length/pageSize)){presentPage++;renderPresentDates()}">Next</button>
-    </div>
-  </div>
-
-
-        <div style="
-          background:rgba(99,102,241,.12);
-          padding:10px 12px;
-          border-radius:6px;
-          font-size:13px;
-          line-height:1.6;
-          border-left:3px solid #6366F1;
-        ">
-          <div><b>Present From:</b> ${res.from}</div>
-          <div><b>To:</b> ${res.to}</div>
-          <div style="margin-top:4px;">
-            <b>Last Present On Date:</b> ${res.to}
-          </div>
-        </div>
-
-    </div>
-
-    ${absentHTML}
-  `;
-
-        // INIT PAGINATION DATA
-        presentDatesData = res.present_dates.slice().sort((a, b) => new Date(a) - new Date(b));
-        absentDatesData = res.absent_dates ? res.absent_dates.slice().sort((a, b) => new Date(a) - new Date(b)) : [];
+        // Save backend data
+        presentDatesData = res.present_records || [];
+        absentDatesData = res.absent_records || [];
+        window.ssnSummary = res.summary || "";
 
         presentPage = 1;
         absentPage = 1;
 
-        renderPresentDates();
+        // RENDER SPLIT VIEW LAYOUT
+        box.innerHTML = `
+    <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+      SSN: <span style="color:#A5B4FC;">${res.ssn}</span>
+    </div>
 
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;">
 
+        <!-- ABSENT (LEFT) -->
+        <div id="absentContainer"></div>
 
+        <!-- PRESENT (RIGHT) -->
+        <div id="presentContainer"></div>
+
+    </div>
+
+    <!-- CONCLUSION -->
+    <div style="
+        padding:14px;
+        background:rgba(99,102,241,.08);
+        border-left:4px solid #6366F1;
+        font-size:13px;
+        line-height:1.6;
+    ">
+      <div style="font-weight:700;margin-bottom:6px;color:#A5B4FC;">Conclusion</div>
+      <div>${window.ssnSummary || "No timeline summary available."}</div>
+    </div>
+  `;
+
+        renderAbsentTable();
+        renderPresentTable();
       }
 
-      // -------------------- MEMBER ID --------------------
+      // -------------------- RENDER HELPERS --------------------
+
+      function renderPresentTable() {
+        renderGenericTable(presentDatesData, presentPage, "presentContainer", "Present Records", "present");
+      }
+
+      function renderAbsentTable() {
+        renderGenericTable(absentDatesData, absentPage, "absentContainer", "Absent Records", "absent");
+      }
+
+      function renderGenericTable(data, page, containerId, title, type) {
+        const pageSize = 10;
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        const items = data.slice(start, end);
+        const totalPages = Math.ceil(data.length / pageSize) || 1;
+
+        let html = `
+        <div style="font-weight:600;margin-bottom:10px;color:#E2E8F0;font-size:14px;">
+            ${title} <span style="font-weight:400;color:#64748B;font-size:12px;margin-left:5px;">(${data.length})</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Date</th>
+              <th>Filename</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+        if (items.length === 0) {
+          html += `<tr><td colspan="3" style="padding:15px;text-align:center;color:#64748B;">No Records Found</td></tr>`;
+        } else {
+          items.forEach((row, index) => {
+            html += `
+              <tr>
+                <td>${start + index + 1}</td>
+                <td>${row.date || "-"}</td>
+                <td>${row.filename || "-"}</td>
+              </tr>
+            `;
+          });
+        }
+
+        html += `</tbody></table>`;
+
+        // Pagination
+        if (totalPages > 1) {
+          const prevFn = type === 'present'
+            ? "if(presentPage>1){presentPage--;renderPresentTable()}"
+            : "if(absentPage>1){absentPage--;renderAbsentTable()}";
+
+          const nextFn = type === 'present'
+            ? `if(presentPage<${totalPages}){presentPage++;renderPresentTable()}`
+            : `if(absentPage<${totalPages}){absentPage++;renderAbsentTable()}`;
+
+          html += `
+            <div style="margin-top:10px;display:flex;justify-content:center;gap:10px;align-items:center;">
+                <button class="page-btn" onclick="${prevFn}">Prev</button>
+                <span style="font-size:12px;">${page} / ${totalPages}</span>
+                <button class="page-btn" onclick="${nextFn}">Next</button>
+            </div>
+        `;
+        }
+
+        const container = document.getElementById(containerId);
+        if (container) container.innerHTML = html;
+      }
+
+
+      // new logic time 14-02-2026 : 19:53
+
+      // new logic time 14-02-2026 : 19:53
+
       async function searchMemberId() {
-        const box = searchResult;
+
+        const box = document.getElementById("searchResult");
         box.style.display = "block";
         box.innerHTML = "Searching...";
 
         const res = await pywebview.api.search_by_member_id(memberId.value);
-        if (!res.success) { box.innerHTML = res.error; return; }
 
-        const sortedDates = res.dates
-          .slice()
-          .sort((a, b) => new Date(a) - new Date(b));
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
 
-        const fromDate = sortedDates[0];
-        const toDate = sortedDates[sortedDates.length - 1];
+        // Save backend data
+        presentDatesData = res.present_records || [];
+        absentDatesData = res.absent_records || [];
+        window.memberSummary = res.summary || "";
 
+        presentPage = 1;
+        absentPage = 1;
+
+        // RENDER SPLIT VIEW LAYOUT (MEMBER ID)
         box.innerHTML = `
-      <div style="
-          background:#1E293B;
-          padding:16px;
-          border-radius:8px;
-          margin-bottom:14px;
-      ">
+    <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+      Member ID: <span style="color:#22D3EE;">${res.member_id}</span>
+    </div>
 
-          <div style="font-size:12px;font-weight:600;color:#22D3EE;margin-bottom:4px;">
-            Member ID
-          </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;">
 
-          <div style="font-size:20px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
-            ${res.member_id}
-          </div>
+        <!-- ABSENT (LEFT) -->
+        <div id="absentContainer"></div>
 
-          <div style="font-weight:600;margin-bottom:8px;color:#67E8F9;font-size:13px;">
-            Present On Dates
-          </div>
+        <!-- PRESENT (RIGHT) -->
+        <div id="presentContainer"></div>
 
-          <div style="margin-bottom:14px;">
-            <div id="memberDatesContainer"></div>
+    </div>
 
-            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-              <button onclick="if(memberPage>1){memberPage--;renderMemberDates()}">Previous</button>
-              <span id="memberPageNumber"></span>
-              <button onclick="if(memberPage<Math.ceil(memberDatesData.length/pageSize)){memberPage++;renderMemberDates()}">Next</button>
-            </div>
-          </div>
+    <!-- CONCLUSION -->
+    <div style="
+        padding:14px;
+        background:rgba(34,211,238,.08);
+        border-left:4px solid #22D3EE;
+        font-size:13px;
+        line-height:1.6;
+    ">
+      <div style="font-weight:700;margin-bottom:6px;color:#22D3EE;">Conclusion</div>
+      <div>${window.memberSummary || "No timeline summary available."}</div>
+    </div>
+  `;
 
-          <div style="
-            background:rgba(34,211,238,.12);
-            padding:10px 12px;
-            border-radius:6px;
-            font-size:13px;
-            line-height:1.6;
-            border-left:3px solid #22D3EE;
-          ">
-            <div><b>Present From:</b> ${fromDate}</div>
-            <div><b>To:</b> ${toDate}</div>
-            <div style="margin-top:4px;">
-              <b>Last Present Date:</b> ${toDate}
-            </div>
-          </div>
-
-      </div>
-    `;
-
-        // INIT PAGINATION
-        memberDatesData = sortedDates.slice();
-        memberPage = 1;
-        renderMemberDates();
+        renderAbsentTable();
+        renderPresentTable();
       }
 
-      // -------------------- MEMBER NAME --------------------
 
+
+
+
+
+
+
+      // -------------------- MEMBER NAME --------------------
       async function searchMemberName() {
-        const box = searchResult;
+
+        const box = document.getElementById("searchResult");
         box.style.display = "block";
         box.innerHTML = "Searching...";
 
         const res = await pywebview.api.search_by_member_name(memberName.value);
         if (!res.success) { box.innerHTML = res.error; return; }
 
-        const sortedDates = res.dates
-          .slice()
-          .sort((a, b) => new Date(a) - new Date(b));
+        // Save backend data
+        presentDatesData = res.present_records || [];
+        absentDatesData = res.absent_records || [];
+        window.ssnSummary = ""; // Member Name has no summary yet
 
-        const fromDate = sortedDates[0];
-        const toDate = sortedDates[sortedDates.length - 1];
+        presentPage = 1;
+        absentPage = 1;
 
+        // RENDER SPLIT VIEW LAYOUT (MEMBER NAME)
         box.innerHTML = `
-      <div style="
-          background:#1E293B;
-          padding:16px;
-          border-radius:8px;
-          margin-bottom:14px;
-      ">
+    <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+      Member Name: <span style="color:#F472B6;">${res.member_name}</span>
+    </div>
 
-          <div style="font-size:12px;font-weight:600;color:#F472B6;margin-bottom:4px;">
-            Member Name
-          </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;">
 
-          <div style="font-size:18px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
-            ${res.member_name}
-          </div>
+        <!-- ABSENT (LEFT) -->
+        <div id="absentContainer"></div>
 
-          <div style="font-weight:600;margin-bottom:8px;color:#F9A8D4;font-size:13px;">
-            Present On Dates
-          </div>
+        <!-- PRESENT (RIGHT) -->
+        <div id="presentContainer"></div>
 
-          <div style="margin-bottom:14px;">
-            <div id="memberNameDatesContainer"></div>
+    </div>
+  `;
 
-            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-              <button onclick="if(memberNamePage>1){memberNamePage--;renderMemberNameDates()}">Previous</button>
-              <span id="memberNamePageNumber"></span>
-              <button onclick="if(memberNamePage<Math.ceil(memberNameDatesData.length/pageSize)){memberNamePage++;renderMemberNameDates()}">Next</button>
-            </div>
-          </div>
-
-          <div style="
-            background:rgba(244,114,182,.12);
-            padding:10px 12px;
-            border-radius:6px;
-            font-size:13px;
-            line-height:1.6;
-            border-left:3px solid #F472B6;
-          ">
-            <div><b>Present From:</b> ${fromDate}</div>
-            <div><b>To:</b> ${toDate}</div>
-            <div style="margin-top:4px;">
-              <b>Last Present Date:</b> ${toDate}
-            </div>
-          </div>
-
-      </div>
-    `;
-
-        // INIT PAGINATION
-        memberNameDatesData = sortedDates.slice();
-        memberNamePage = 1;
-        renderMemberNameDates();
+        renderAbsentTable();
+        renderPresentTable();
       }
+
 
       // -------------------- DATE RANGE --------------------
       async function searchDateRange() {
@@ -933,6 +1126,6 @@
 
     </script>
 
-  </body>
+</body>
 
-  </html>
+</html>
