@@ -1,1450 +1,938 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>834 Eligibility Search System</title>
-
-<style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-
-:root{
-  --primary:#4F46E5;
-  --primary-dark:#4338CA;
-  --accent:#6366F1;
-  --bg:#0F172A;
-  --card:#111827;
-  --glass:rgba(255,255,255,0.05);
-  --text:#F8FAFC;
-  --muted:#94A3B8;
-  --border:rgba(255,255,255,0.08);
-  --shadow:0 15px 40px rgba(0,0,0,.45);
-  --radius:18px;
-}
-
-*{
-  box-sizing:border-box;
-  font-family:"Inter",system-ui,-apple-system;
-  transition:all .25s ease;
-}
-
-body{
-  margin:0;
-  background:linear-gradient(135deg,#0F172A,#1E293B);
-  color:var(--text);
-}
-
-/* HEADER */
-header{
-  background:linear-gradient(90deg,#4F46E5,#9333EA);
-  padding:32px;
-  text-align:center;
-  font-size:26px;
-  font-weight:800;
-  letter-spacing:.5px;
-  color:#fff;
-  box-shadow:0 10px 35px rgba(0,0,0,.6);
-}
-
-/* LAYOUT */
-.container{
-  max-width:1300px;
-  margin:auto;
-  padding:60px 30px;
-}
-
-/* CARD */
-.card{
-  background:var(--glass);
-  backdrop-filter:blur(18px);
-  border-radius:var(--radius);
-  padding:32px;
-  margin-bottom:35px;
-  border:1px solid var(--border);
-  box-shadow:var(--shadow);
-}
-
-.card:hover{
-  transform:translateY(-5px) scale(1.01);
-  box-shadow:0 20px 50px rgba(0,0,0,.6);
-}
-
-.card h2{
-  margin-bottom:25px;
-  font-size:20px;
-  font-weight:700;
-  color:#A5B4FC;
-  letter-spacing:.5px;
-}
-
-/* FORM */
-label{
-  display:block;
-  margin-bottom:6px;
-  font-size:13px;
-  font-weight:500;
-  color:var(--muted);
-}
-
-input,select{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  font-size:14px;
-  background:rgba(255,255,255,0.04);
-  color:#fff;
-}
-
-input::placeholder{
-  color:#94A3B8;
-}
-
-input:focus,select:focus{
-  outline:none;
-  border-color:#6366F1;
-  box-shadow:0 0 0 3px rgba(99,102,241,.35);
-  background:rgba(255,255,255,0.07);
-}
-
-/* GRID */
-.grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-  gap:35px;
-}
-
-/* BUTTON */
-button{
-  margin-top:12px;
-  background:linear-gradient(135deg,#6366F1,#4F46E5);
-  color:#fff;
-  border:none;
-  padding:14px 22px;
-  border-radius:14px;
-  font-weight:600;
-  font-size:14px;
-  cursor:pointer;
-  box-shadow:0 10px 25px rgba(79,70,229,.45);
-}
-
-button:hover{
-  background:linear-gradient(135deg,#4F46E5,#4338CA);
-  transform:translateY(-2px);
-}
-
-button.secondary{
-  background:linear-gradient(135deg,#0EA5E9,#06B6D4);
-  box-shadow:0 10px 25px rgba(6,182,212,.45);
-}
-
-button.secondary:hover{
-  transform:translateY(-2px);
-}
-
-/* RESULT */
-.result{
-  display:none;
-  margin-top:25px;
-  padding:22px;
-  background:rgba(255,255,255,0.04);
-  border-radius:16px;
-  border:1px solid var(--border);
-  font-size:14px;
-  backdrop-filter:blur(12px);
-}
-
-.result b{
-  color:#A5B4FC;
-}
-
-.badge{
-  display:inline-block;
-  padding:6px 12px;
-  margin:4px;
-  border-radius:20px;
-  background:linear-gradient(135deg,#4F46E5,#7C3AED);
-  font-size:12px;
-  font-weight:600;
-  box-shadow:0 5px 12px rgba(79,70,229,.5);
-}
-
-.badge:hover{
-  transform:scale(1.08);
-}
-
-/* FOOTER */
-footer{
-  text-align:center;
-  padding:40px;
-  font-size:13px;
-  color:#94A3B8;
-  border-top:1px solid var(--border);
-  background:#0F172A;
-}
-
-/* Scrollbar Premium */
-::-webkit-scrollbar{width:8px;}
-::-webkit-scrollbar-thumb{
-  background:#6366F1;
-  border-radius:10px;
-}
-::-webkit-scrollbar-track{
-  background:#1E293B;
-}
-
-/* Subtle animation */
-.card{
-  animation:fadeUp .5s ease both;
-}
-@keyframes fadeUp{
-  from{opacity:0;transform:translateY(20px);}
-  to{opacity:1;transform:none;}
-}
-
-/* ================= LIGHT MODE ================= */
-
-body.light-mode{
-  --bg:#F3F4F6;
-  --card:#FFFFFF;
-  --glass:#FFFFFF;
-  --text:#0F172A;
-  --muted:#475569;
-  --border:rgba(0,0,0,0.1);
-}
-
-body.light-mode{
-  background:linear-gradient(135deg,#F3F4F6,#E5E7EB);
-  color:var(--text);
-}
-
-body.light-mode .card{
-  background:#FFFFFF;
-  box-shadow:0 15px 40px rgba(0,0,0,.08);
-}
-
-body.light-mode header{
-  background:linear-gradient(90deg,#4F46E5,#9333EA);
-}
-
-body.light-mode footer{
-  background:#FFFFFF;
-  color:#475569;
-}
-
-body.light-mode input,
-body.light-mode select{
-  background:#FFFFFF;
-  color:#000;
-}
-
-/* new css for the light theme : 10-02-2026 ******************************************/
-/* ================= MODERN FUNCTION COLOR STATES ================= */
-
-/* SSN Search Result */
-#searchResult:has(b:contains("SSN")) {
-  border-left:4px solid #6366F1;
-}
-
-/* Member ID Result */
-#searchResult:has(b:contains("Member ID")) {
-  border-left:4px solid #22D3EE;
-}
-
-/* Member Name Result */
-#searchResult:has(b:contains("Member Name")) {
-  border-left:4px solid #F472B6;
-}
-
-/* Date Range Result */
-#rangeResult {
-  border-left:4px solid #10B981;
-}
-
-/* ================= MODERN BUTTON STATES ================= */
-
-/* SSN Button */
-button[onclick="searchSSN()"]{
-  background:linear-gradient(135deg,#6366F1,#8B5CF6);
-}
-button[onclick="searchSSN()"]:hover{
-  box-shadow:0 0 25px rgba(99,102,241,.7);
-}
-
-/* Member ID Button */
-button[onclick="searchMemberId()"]{
-  background:linear-gradient(135deg,#06B6D4,#22D3EE);
-}
-button[onclick="searchMemberId()"]:hover{
-  box-shadow:0 0 25px rgba(34,211,238,.7);
-}
-
-/* Member Name Button */
-button[onclick="searchMemberName()"]{
-  background:linear-gradient(135deg,#EC4899,#F472B6);
-}
-button[onclick="searchMemberName()"]:hover{
-  box-shadow:0 0 25px rgba(236,72,153,.7);
-}
-
-/* Date Range Button */
-button.secondary{
-  background:linear-gradient(135deg,#10B981,#34D399);
-}
-button.secondary:hover{
-  box-shadow:0 0 25px rgba(16,185,129,.7);
-}
-
-/* ================= MODERN BADGE COLOR VARIATION ================= */
-
-#searchResult .badge{
-  background:linear-gradient(135deg,#6366F1,#8B5CF6);
-}
-
-#rangeResult .badge{
-  background:linear-gradient(135deg,#10B981,#34D399);
-}
-
-/* ================= ULTRA MODERN LIGHT MODE ================= */
-
-body.light-mode{
-  --bg:#F8FAFC;
-  --card:#FFFFFF;
-  --glass:#FFFFFF;
-  --text:#0F172A;
-  --muted:#475569;
-  --border:#E5E7EB;
-}
-
-/* Clean modern light background */
-body.light-mode{
-  background:
-    radial-gradient(circle at 20% 20%, rgba(99,102,241,.08), transparent 40%),
-    radial-gradient(circle at 80% 80%, rgba(16,185,129,.08), transparent 40%),
-    #F8FAFC;
-}
-
-/* Light mode cards elevated */
-body.light-mode .card{
-  background:#FFFFFF;
-  box-shadow:0 20px 50px rgba(0,0,0,.08);
-  border:1px solid #E5E7EB;
-}
-
-/* Light inputs modern */
-body.light-mode input,
-body.light-mode select{
-  background:#F9FAFB;
-  color:#111827;
-  border:1px solid #E5E7EB;
-}
-
-body.light-mode input:focus,
-body.light-mode select:focus{
-  border-color:#6366F1;
-  box-shadow:0 0 0 4px rgba(99,102,241,.25);
-}
-
-/* Light mode badge refinement */
-body.light-mode .badge{
-  background:linear-gradient(135deg,#4F46E5,#6366F1);
-  color:#fff;
-}
-
-/* Light mode footer */
-body.light-mode footer{
-  background:#FFFFFF;
-  border-top:1px solid #E5E7EB;
-  color:#64748B;
-}
-
-/* ================= MODE BUTTON POLISH ================= */
-
-#modeToggle{
-  background:linear-gradient(135deg,#FBBF24,#F59E0B);
-  color:#111;
-}
-body.light-mode #modeToggle{
-  background:linear-gradient(135deg,#111827,#1F2937);
-  color:#fff;
-}
-
-/* new style : 11-02-2026 */
-/* ================= NEXT LEVEL LIGHT MODE ================= */
-
-body.light-mode{
-  background:
-    radial-gradient(circle at 15% 20%, rgba(79,70,229,.10), transparent 35%),
-    radial-gradient(circle at 85% 75%, rgba(16,185,129,.10), transparent 35%),
-    linear-gradient(135deg,#F8FAFC,#EEF2FF);
-}
-
-/* Header premium glass */
-body.light-mode header{
-  background:linear-gradient(135deg,#4F46E5,#6366F1);
-  box-shadow:0 15px 40px rgba(79,70,229,.25);
-}
-
-/* Cards ultra clean */
-body.light-mode .card{
-  background:#FFFFFF;
-  border:1px solid #E5E7EB;
-  box-shadow:
-    0 10px 25px rgba(0,0,0,.05),
-    0 2px 6px rgba(0,0,0,.04);
-}
-
-/* Card hover elevation */
-body.light-mode .card:hover{
-  transform:translateY(-6px);
-  box-shadow:
-    0 20px 45px rgba(0,0,0,.08),
-    0 5px 12px rgba(0,0,0,.06);
-}
-
-/* Section titles more modern */
-body.light-mode .card h2{
-  color:#4F46E5;
-  letter-spacing:.5px;
-  font-weight:700;
-}
-
-/* Inputs clean enterprise */
-body.light-mode input,
-body.light-mode select{
-  background:#F9FAFB;
-  border:1px solid #E5E7EB;
-  box-shadow:inset 0 1px 2px rgba(0,0,0,.04);
-}
-
-/* Focus ultra premium */
-body.light-mode input:focus,
-body.light-mode select:focus{
-  border-color:#4F46E5;
-  box-shadow:
-    0 0 0 4px rgba(79,70,229,.15),
-    inset 0 1px 2px rgba(0,0,0,.05);
-  background:#FFFFFF;
-}
-
-/* Buttons modern flat-gloss */
-body.light-mode button{
-  background:linear-gradient(135deg,#4F46E5,#6366F1);
-  box-shadow:0 10px 25px rgba(79,70,229,.20);
-}
-
-body.light-mode button:hover{
-  box-shadow:0 15px 35px rgba(79,70,229,.30);
-}
-
-/* Secondary button */
-body.light-mode button.secondary{
-  background:linear-gradient(135deg,#10B981,#34D399);
-  box-shadow:0 10px 25px rgba(16,185,129,.20);
-}
-
-/* Result box corporate highlight */
-body.light-mode .result{
-  background:#FFFFFF;
-  border-left:5px solid #4F46E5;
-  box-shadow:
-    0 10px 25px rgba(0,0,0,.05);
-}
-
-/* Range result green accent */
-body.light-mode #rangeResult{
-  border-left:5px solid #10B981;
-}
-
-/* Badges modern chips */
-body.light-mode .badge{
-  background:linear-gradient(135deg,#4F46E5,#6366F1);
-  border:none;
-  box-shadow:0 4px 10px rgba(79,70,229,.15);
-}
-
-/* Footer premium */
-body.light-mode footer{
-  background:#FFFFFF;
-  border-top:1px solid #E5E7EB;
-  color:#64748B;
-  box-shadow:0 -5px 20px rgba(0,0,0,.03);
-}
-
-/* Mode button stylish */
-body.light-mode #modeToggle{
-  background:linear-gradient(135deg,#1E293B,#334155);
-  color:#fff;
-  box-shadow:0 8px 20px rgba(0,0,0,.15);
-}
-
-/* new logic : 11-02-2026 */
-
-
-/* ================= MODERN DROPDOWN FIX ================= */
-
-select{
-  appearance:none;
-  -webkit-appearance:none;
-  -moz-appearance:none;
-  cursor:pointer;
-  background:
-    linear-gradient(135deg,#1F2937,#111827);
-  color:#FFFFFF;
-  font-weight:600;
-  padding-right:40px;
-  background-image:
-    url("data:image/svg+xml;utf8,<svg fill='white' height='20' viewBox='0 0 20 20' width='20' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>");
-  background-repeat:no-repeat;
-  background-position:right 12px center;
-  background-size:16px;
-}
-
-/* dropdown options readable */
-select option{
-  background:#1F2937;
-  color:#FFFFFF;
-  padding:10px;
-}
-
-/* Light mode dropdown */
-body.light-mode select{
-  background:#FFFFFF;
-  color:#111827;
-  border:1px solid #E5E7EB;
-}
-
-body.light-mode select option{
-  background:#FFFFFF;
-  color:#111827;
-}
-
-/* it is a extra logic added on 11-02-2026 */
-
-/* ================= FIX RESULT BOX IN LIGHT MODE ================= */
-/* ================= GLASSY PREMIUM SSN CARD - LIGHT MODE ================= */
-
-body.light-mode #searchResult > div:first-child{
-  background:rgba(255,255,255,0.65) !important;
-  backdrop-filter:blur(18px) !important;
-  -webkit-backdrop-filter:blur(18px) !important;
-
-  border:1px solid rgba(99,102,241,.25) !important;
-  border-left:4px solid #6366F1 !important;
-
-  box-shadow:
-    0 20px 45px rgba(79,70,229,.12),
-    0 4px 10px rgba(0,0,0,.05) !important;
-
-  color:#0F172A !important;
-}
-
-/* SSN label */
-body.light-mode #searchResult > div:first-child div:first-child{
-  color:#6366F1 !important;
-  font-weight:700;
-  letter-spacing:.5px;
-}
-
-/* SSN Number premium */
-body.light-mode #searchResult > div:first-child div:nth-child(2){
-  font-size:26px !important;
-  font-weight:800 !important;
-  background:linear-gradient(135deg,#4F46E5,#7C3AED);
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-}
-
-/* Present On Dates label */
-body.light-mode #searchResult > div:first-child div:nth-child(3){
-  color:#334155 !important;
-  font-weight:600;
-}
-
-/* Inner Date Info Box - Modern Glass */
-body.light-mode #searchResult > div:first-child div[style*="border-left"]{
-  background:rgba(99,102,241,.08) !important;
-  backdrop-filter:blur(10px);
-  border-left:4px solid #4F46E5 !important;
-  border-radius:10px;
-  color:#0F172A !important;
-}
-
-/* Bold text inside */
-body.light-mode #searchResult > div:first-child div[style*="border-left"] b{
-  color:#4F46E5 !important;
-}
-
-/* Show Absent Button Glass Style */
-body.light-mode .btn-toggle{
-  background:linear-gradient(135deg,#4F46E5,#6366F1) !important;
-  box-shadow:0 12px 28px rgba(79,70,229,.25);
-  border:none;
-}
-
-body.light-mode .btn-toggle:hover{
-  box-shadow:0 18px 40px rgba(79,70,229,.35);
-  transform:translateY(-2px);
-}
-
-/* new logic added here date : 12-02-2026 ******************************************** */
-/* for the light mode  */
-
-/* ================= FIX PAGINATION BUTTONS IN LIGHT MODE ================= */
-
-body.light-mode button[onclick*="renderPresentDates"],
-body.light-mode button[onclick*="renderAbsentDates"],
-body.light-mode button[onclick*="renderMemberDates"],
-body.light-mode button[onclick*="renderMemberNameDates"]{
-
-  background:linear-gradient(135deg,#4F46E5,#6366F1) !important;
-  color:#FFFFFF !important;
-  border:none;
-  box-shadow:0 8px 20px rgba(79,70,229,.25);
-  padding:8px 16px;
-  border-radius:12px;
-  font-weight:600;
-}
-
-/* Hover effect */
-body.light-mode button[onclick*="renderPresentDates"]:hover,
-body.light-mode button[onclick*="renderAbsentDates"]:hover,
-body.light-mode button[onclick*="renderMemberDates"]:hover,
-body.light-mode button[onclick*="renderMemberNameDates"]:hover{
-
-  box-shadow:0 12px 28px rgba(79,70,229,.35);
-  transform:translateY(-2px);
-}
-
-/* Page text visibility */
-body.light-mode #presentPageNumber,
-body.light-mode #absentPageNumber,
-body.light-mode #memberPageNumber,
-body.light-mode #memberNamePageNumber{
-  color:#4F46E5 !important;
-  font-weight:700;
-  font-size:16px;
-}
-
-/* new 12-02-2026 time : 15:27*/
-/* ================= PAGINATION FIX FINAL ================= */
-
-.page-btn{
-  padding:8px 18px;
-  border-radius:12px;
-  font-weight:600;
-  border:none;
-  cursor:pointer;
-  font-size:14px;
-}
-
-/* Dark Mode */
-body:not(.light-mode) .page-btn{
-  background:linear-gradient(135deg,#6366F1,#8B5CF6);
-  color:#ffffff;
-  box-shadow:0 8px 20px rgba(99,102,241,.35);
-}
-
-/* Light Mode */
-body.light-mode .page-btn{
-  background:linear-gradient(135deg,#4F46E5,#6366F1);
-  color:#ffffff;
-  box-shadow:0 8px 20px rgba(79,70,229,.25);
-}
-
-.page-btn:hover{
-  transform:translateY(-2px);
-}
-
-/* Page Number Color */
-body.light-mode #presentPageNumber,
-body.light-mode #absentPageNumber,
-body.light-mode #memberPageNumber,
-body.light-mode #memberNamePageNumber{
-  color:#4F46E5;
-  font-weight:700;
-}
-
-
-</style>
-
-</head>
-
-<body>
-
-<header>
-  834 Eligibility Search System
-  <div style="font-size:13px;font-weight:500;opacity:.85">
-    Enterprise Enrollment Audit Tool
-  </div>
-  <button id="modeToggle" onclick="toggleMode()" style="
-  margin-top:15px;
-  padding:8px 18px;
-  border-radius:25px;
-  border:none;
-  cursor:pointer;
-  font-weight:600;
-">
-  Toggle Mode
-</button>
-
-</header>
-
-<div class="container">
-
-<!-- it is a old logic 13-02-2026 -->
-<!-- COMPANY -->
-<!-- <div class="card">
-  <h2>Select Company</h2>
-  <select id="company">
-    <option>AHH_AMO</option>
-    <option>ANTHEM_ABC_MUSGROW</option>
-    <option>TELADOC</option>
-    <option>SAVRX</option>
-  </select>
-  <button onclick="selectCompany()">Confirm Company</button>
-</div> -->
-
-
-<!-- it is a new logic 13-02-2026 -->
-<div class="card">
-  <h2>Select Company</h2>
-
-  <!-- COMPANY DROPDOWN -->
-  <select id="company" onchange="selectCompany()">
-    <option value="">Select Company</option>
-    <option>AHH_AMO</option>
-    <option>ANTHEM_ABC_MUSGROW</option>
-    <option>TELADOC</option>
-    <option>SAVRX</option>
-  </select>
-
-  <!-- SUBFOLDER DROPDOWN (OPTIONAL - HIDDEN DEFAULT) -->
-  <div id="subfolderWrapper" style="margin-top:15px; display:none;">
-    <select id="subfolder" onchange="selectSubfolder()">
-      <option value="">All Folders (Default)</option>
-    </select>
-  </div>
-
-</div>
-
-
-
-
-<!-- SEARCH -->
-<div class="card">
-  <h2>Search Records</h2>
-  <div class="grid">
-
-    <div>
-      <label>SSN</label>
-      <input id="ssn" placeholder="277110696">
-      <button onclick="searchSSN()">Search SSN</button>
+  <!DOCTYPE html>
+  <html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>834 Eligibility Search System</title>
+
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Inter", system-ui, -apple-system, sans-serif;
+      }
+
+      body {
+        background: #0F172A;
+        color: #E2E8F0;
+        min-height: 100vh;
+      }
+
+      /* HEADER */
+      header {
+        background: #1E293B;
+        padding: 16px 24px;
+        border-bottom: 1px solid #334155;
+      }
+
+      header h1 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #F1F5F9;
+        letter-spacing: .3px;
+      }
+
+      header p {
+        font-size: 11px;
+        color: #64748B;
+        margin-top: 2px;
+      }
+
+      /* LAYOUT */
+      .container {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 28px 20px;
+      }
+
+      /* SECTION LABELS */
+      .section-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #64748B;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      /* FORM ELEMENTS */
+      label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: #94A3B8;
+        margin-bottom: 4px;
+      }
+
+      select,
+      input[type="text"],
+      input:not([type="hidden"]) {
+        width: 100%;
+        padding: 9px 12px;
+        border-radius: 6px;
+        border: 1px solid #334155;
+        font-size: 13px;
+        background: #1E293B;
+        color: #E2E8F0;
+        outline: none;
+        transition: border-color .2s, box-shadow .2s;
+      }
+
+      select {
+        appearance: none;
+        -webkit-appearance: none;
+        cursor: pointer;
+        background-image: url("data:image/svg+xml;utf8,<svg fill='%2394A3B8' height='16' viewBox='0 0 20 20' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        padding-right: 32px;
+      }
+
+      select option {
+        background: #1E293B;
+        color: #E2E8F0;
+      }
+
+      input:focus,
+      select:focus {
+        border-color: #6366F1;
+        box-shadow: 0 0 0 2px rgba(99, 102, 241, .2);
+      }
+
+      input::placeholder {
+        color: #475569;
+      }
+
+      /* SPACING BETWEEN FORM ROWS */
+      .form-row {
+        margin-bottom: 14px;
+      }
+
+      /* BUTTON */
+      button {
+        padding: 9px 20px;
+        border-radius: 6px;
+        border: none;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #4F46E5;
+        color: #fff;
+        transition: background .2s;
+      }
+
+      button:hover {
+        background: #4338CA;
+      }
+
+      button.secondary {
+        background: #0F766E;
+      }
+
+      button.secondary:hover {
+        background: #115E59;
+      }
+
+      /* DIVIDER */
+      .divider {
+        border: none;
+        border-top: 1px solid #1E293B;
+        margin: 24px 0;
+      }
+
+      /* RESULT */
+      .result {
+        display: none;
+        margin-top: 18px;
+        padding: 14px;
+        background: #1E293B;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        font-size: 13px;
+      }
+
+      .result b {
+        color: #A5B4FC;
+      }
+
+      /* BADGE */
+      .badge {
+        display: inline-block;
+        padding: 4px 10px;
+        margin: 3px;
+        border-radius: 4px;
+        background: #312E81;
+        color: #C7D2FE;
+        font-size: 12px;
+        font-weight: 500;
+      }
+
+      /* PAGE BUTTON */
+      .page-btn {
+        padding: 6px 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        font-size: 12px;
+        background: #4F46E5;
+        color: #fff;
+      }
+
+      .page-btn:hover {
+        background: #4338CA;
+      }
+
+      /* TOGGLE BUTTON (absent dates) */
+      .btn-toggle {
+        padding: 7px 16px;
+        border-radius: 6px;
+        border: none;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        background: #334155;
+        color: #E2E8F0;
+      }
+
+      .btn-toggle:hover {
+        background: #475569;
+      }
+
+      /* DATE RANGE GRID */
+      .date-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      /* FOOTER */
+      footer {
+        text-align: center;
+        padding: 18px;
+        font-size: 11px;
+        color: #475569;
+        border-top: 1px solid #1E293B;
+      }
+
+      /* SCROLLBAR */
+      ::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: #334155;
+        border-radius: 3px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #0F172A;
+      }
+    </style>
+
+  </head>
+
+  <body>
+
+    <header>
+      <h1>834 Eligibility Search System</h1>
+      <!-- <p>Enterprise Enrollment Audit Tool</p> -->
+    </header>
+
+    <div class="container">
+
+      <!-- COMPANY -->
+      <div class="form-row">
+        <label>Company</label>
+        <select id="company" onchange="selectCompany()">
+          <option value="">Select Company</option>
+          <option>AHH_AMO</option>
+          <option>ANTHEM_ABC_MUSGROW</option>
+          <option>TELADOC</option>
+          <option>SAVRX</option>
+        </select>
+      </div>
+
+      <!-- SUBFOLDER (OPTIONAL) -->
+      <div id="subfolderWrapper" class="form-row" style="display:none;">
+        <label>Subfolder (Optional)</label>
+        <select id="subfolder" onchange="selectSubfolder()">
+          <option value="">All Folders (Default)</option>
+        </select>
+      </div>
+
+      <!-- SEARCH TYPE -->
+      <div class="form-row">
+        <label>Search Type</label>
+        <select id="searchType" onchange="updateSearchPlaceholder()">
+          <option value="ssn">SSN</option>
+          <option value="member_id">Member ID</option>
+          <option value="member_name">Member Name</option>
+        </select>
+      </div>
+
+      <!-- SEARCH INPUT -->
+      <div class="form-row">
+        <label id="searchInputLabel">Enter SSN</label>
+        <input id="searchInput" placeholder="277110696">
+      </div>
+
+      <!-- SEARCH BUTTON -->
+      <button onclick="executeSearch()">Search</button>
+
+      <!-- HIDDEN INPUTS (backward compatibility) -->
+      <input type="hidden" id="ssn">
+      <input type="hidden" id="memberId">
+      <input type="hidden" id="memberName">
+
+      <!-- SEARCH RESULT -->
+      <div id="searchResult" class="result"></div>
+
+      <hr class="divider">
+
+      <!-- DATE RANGE -->
+      <div class="section-label">Date Range → All SSNs</div>
+
+      <div class="date-grid" style="margin-bottom:14px;">
+        <div>
+          <label>Start Date (DD-MM-YYYY)</label>
+          <input id="startDate">
+        </div>
+        <div>
+          <label>End Date (DD-MM-YYYY)</label>
+          <input id="endDate">
+        </div>
+      </div>
+
+      <button class="secondary" onclick="searchDateRange()">Find SSNs</button>
+      <div id="rangeResult" class="result"></div>
+
     </div>
 
-    <div>
-      <label>Member ID</label>
-      <input id="memberId" placeholder="0072701BR">
-      <button onclick="searchMemberId()">Search Member ID</button>
-    </div>
+    <!-- <footer>
+      &copy; 2026 &middot; Healthcare Eligibility Automation Platform
+    </footer> -->
 
-    <div>
-      <label>Member Name</label>
-      <input id="memberName" placeholder="MASON ROBERT W">
-      <button onclick="searchMemberName()">Search Member Name</button>
-    </div>
+    <script>
 
-  </div>
+      // new logic for pagination of dates in ssn logic : 12-02-2026****************************14:27
+      // ===== PAGINATION STATE =====
+      let presentDatesData = [];
+      let absentDatesData = [];
 
-  <div id="searchResult" class="result"></div>
-</div>
+      let presentPage = 1;
+      let absentPage = 1;
 
-<!-- DATE RANGE -->
-<div class="card">
-  <h2>Date Range → All SSNs</h2>
-  <div class="grid">
-    <div>
-      <label>Start Date (DD-MM-YYYY)</label>
-      <input id="startDate">
-    </div>
-    <div>
-      <label>End Date (DD-MM-YYYY)</label>
-      <input id="endDate">
-    </div>
-  </div>
+      const pageSize = 10;
 
-  <button class="secondary" onclick="searchDateRange()">Find SSNs</button>
-  <div id="rangeResult" class="result"></div>
-</div>
+      // new logic for member_id : 12-02-2026*********************************************************
+      let memberDatesData = [];
+      let memberPage = 1;
 
-</div>
-
-<footer>
-  © 2026 · Healthcare Eligibility Automation Platform
-</footer>
-
-<script>
-
-// new logic for pagination of dates in ssn logic : 12-02-2026****************************14:27
-// ===== PAGINATION STATE =====
-let presentDatesData = [];
-let absentDatesData = [];
-
-let presentPage = 1;
-let absentPage = 1;
-
-const pageSize = 10;
-
-// new logic for member_id : 12-02-2026*********************************************************
-let memberDatesData = [];
-let memberPage = 1;
-
-// new logic for member name : 12-02-2026*******************************************************
-let memberNameDatesData = [];
-let memberNamePage = 1;
+      // new logic for member name : 12-02-2026*******************************************************
+      let memberNameDatesData = [];
+      let memberNamePage = 1;
 
 
-// new loigc for pagination of dates in ssn range logic : 13-02-2026****************************
-// ===== DATE RANGE PAGINATION =====
-let rangeSSNData = [];
-let rangePage = 1;
-const rangePageSize = 30;
-let currentRangeData = [];
+      // new loigc for pagination of dates in ssn range logic : 13-02-2026****************************
+      // ===== DATE RANGE PAGINATION =====
+      let rangeSSNData = [];
+      let rangePage = 1;
+      const rangePageSize = 30;
+      let currentRangeData = [];
 
 
 
-// new date ssn range logic date : 13-02-2026** 13:29
-function renderRangeTable(data = null){
+      // new date ssn range logic date : 13-02-2026** 13:29
+      function renderRangeTable(data = null) {
 
-  // store active dataset globally
-  currentRangeData = data ? data : rangeSSNData;
+        // store active dataset globally
+        currentRangeData = data ? data : rangeSSNData;
 
-  const start = (rangePage - 1) * rangePageSize;
-  const end = start + rangePageSize;
-  const pageItems = currentRangeData.slice(start, end);
+        const start = (rangePage - 1) * rangePageSize;
+        const end = start + rangePageSize;
+        const pageItems = currentRangeData.slice(start, end);
 
-  let tableHTML = `
-    <div style="margin-top:20px;margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
-        <input id="rangeSearchInput" 
-               placeholder="Search SSN..."
-               style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:white;font-size:14px;">
+        let tableHTML = `
+      <div style="margin-top:20px;margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
+          <input id="rangeSearchInput" 
+                placeholder="Search SSN..."
+                style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:white;font-size:14px;">
 
-        <button class="page-btn" onclick="filterRangeSSN()">
-            Search
-        </button>
+          <button class="page-btn" onclick="filterRangeSSN()">
+              Search
+          </button>
 
-        <button class="page-btn" onclick="resetRangeSearch()">
-            Cancel
-        </button>
-    </div>
+          <button class="page-btn" onclick="resetRangeSearch()">
+              Cancel
+          </button>
+      </div>
 
-    <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;">
-      <thead>
-        <tr style="background:linear-gradient(135deg,#4F46E5,#7C3AED);color:white;">
-          <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">#</th>
-          <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">SSN</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+      <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;">
+        <thead>
+          <tr style="background:linear-gradient(135deg,#4F46E5,#7C3AED);color:white;">
+            <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">#</th>
+            <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">SSN</th>
+          </tr>
+        </thead>
+        <tbody>
+    `;
 
-  if(pageItems.length === 0){
-      tableHTML += `
-        <tr>
-            <td colspan="2" style="padding:15px;text-align:center;">
-                No SSN Found
-            </td>
+        if (pageItems.length === 0) {
+          tableHTML += `
+          <tr>
+              <td colspan="2" style="padding:15px;text-align:center;">
+                  No SSN Found
+              </td>
+          </tr>
+        `;
+        }
+
+        pageItems.forEach((ssn, index) => {
+          tableHTML += `
+        <tr style="text-align:center;background:rgba(255,255,255,.03);">
+          <td style="padding:8px;border:1px solid rgba(255,255,255,.08);">
+            ${start + index + 1}
+          </td>
+          <td style="padding:8px;border:1px solid rgba(255,255,255,.08);font-weight:600;">
+            ${ssn}
+          </td>
         </tr>
       `;
-  }
+        });
 
-  pageItems.forEach((ssn,index)=>{
-    tableHTML += `
-      <tr style="text-align:center;background:rgba(255,255,255,.03);">
-        <td style="padding:8px;border:1px solid rgba(255,255,255,.08);">
-          ${start + index + 1}
-        </td>
-        <td style="padding:8px;border:1px solid rgba(255,255,255,.08);font-weight:600;">
-          ${ssn}
-        </td>
-      </tr>
+        tableHTML += `
+        </tbody>
+      </table>
+
+      <div style="margin-top:15px;display:flex;justify-content:center;align-items:center;gap:15px;">
+        <button class="page-btn"
+          onclick="if(rangePage>1){rangePage--;renderRangeTable(currentRangeData);}">
+          Previous
+        </button>
+
+        <span style="font-weight:600;">
+          Page ${rangePage} of ${Math.ceil(currentRangeData.length / rangePageSize)}
+        </span>
+
+        <button class="page-btn"
+          onclick="if(rangePage<Math.ceil(currentRangeData.length/rangePageSize)){rangePage++;renderRangeTable(currentRangeData);}">
+          Next
+        </button>
+      </div>
     `;
-  });
 
-  tableHTML += `
-      </tbody>
-    </table>
+        document.getElementById("rangeResult").innerHTML = `
+        <div><b>Total Unique SSNs:</b> ${currentRangeData.length}</div>
+        ${tableHTML}
+    `;
+      }
 
-    <div style="margin-top:15px;display:flex;justify-content:center;align-items:center;gap:15px;">
-      <button class="page-btn"
-        onclick="if(rangePage>1){rangePage--;renderRangeTable(currentRangeData);}">
-        Previous
-      </button>
 
-      <span style="font-weight:600;">
-        Page ${rangePage} of ${Math.ceil(currentRangeData.length / rangePageSize)}
-      </span>
+      // new elogic 13-02-2026************
 
-      <button class="page-btn"
-        onclick="if(rangePage<Math.ceil(currentRangeData.length/rangePageSize)){rangePage++;renderRangeTable(currentRangeData);}">
-        Next
+      function resetRangeSearch() {
+        rangePage = 1;
+        renderRangeTable(rangeSSNData);
+      }
+
+
+      // new extra logic for filtering ssn in date range 13-02-2026
+      function filterRangeSSN() {
+
+        const input = document.getElementById("rangeSearchInput").value.trim();
+
+        if (!input) {
+          rangePage = 1;
+          renderRangeTable();
+          return;
+        }
+
+        const filtered = rangeSSNData.filter(ssn => ssn.includes(input));
+
+        rangePage = 1;
+
+        renderRangeTable(filtered);
+      }
+
+
+
+      // new member function for a pagination : 12-02-2026********************************************
+      function renderMemberDates() {
+        const start = (memberPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = memberDatesData.slice(start, end);
+
+        document.getElementById("memberDatesContainer").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("memberPageNumber").innerText =
+          `Page ${memberPage} of ${Math.ceil(memberDatesData.length / pageSize)}`;
+      }
+
+
+      // new member name function for a pagiantion : 12-02-2026**************************************
+      function renderMemberNameDates() {
+        const start = (memberNamePage - 1) * pageSize;
+        const end = start + pageSize;
+
+        const pageItems = memberNameDatesData.slice(start, end);
+
+        document.getElementById("memberNameDatesContainer").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("memberNamePageNumber").innerText =
+          `Page ${memberNamePage} of ${Math.ceil(memberNameDatesData.length / pageSize)}`;
+      }
+
+
+      // new logic for pagination of dates in ssn logic : 12-02-26******************************14:27
+
+      function renderPresentDates() {
+        const start = (presentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = presentDatesData.slice(start, end);
+
+        document.getElementById("presentDatesContainer").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("presentPageNumber").innerText =
+          `Page ${presentPage} of ${Math.ceil(presentDatesData.length / pageSize)}`;
+      }
+
+      function renderAbsentDates() {
+        const start = (absentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = absentDatesData.slice(start, end);
+
+        document.getElementById("absentDatesBox").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("absentPageNumber").innerText =
+          `Page ${absentPage} of ${Math.ceil(absentDatesData.length / pageSize)}`;
+      }
+
+      // -------------------- COMPANY --------------------
+      async function selectCompany() {
+
+        const selectedCompany = document.getElementById("company").value;
+
+        if (!selectedCompany) {
+          return;
+        }
+
+        const res = await pywebview.api.select_company(selectedCompany);
+
+        if (!res.success) {
+          alert(res.error);
+          return;
+        }
+
+        // Show subfolder dropdown if folders available
+        const subWrapper = document.getElementById("subfolderWrapper");
+        const subSelect = document.getElementById("subfolder");
+
+        subSelect.innerHTML = `<option value="">All Folders (Default)</option>`;
+
+        if (res.subfolders && res.subfolders.length >= 1) {
+
+          res.subfolders.forEach(folder => {
+            subSelect.innerHTML += `<option value="${folder}">${folder}</option>`;
+          });
+
+          subWrapper.style.display = "block";
+
+        } else {
+          subWrapper.style.display = "none";
+        }
+      }
+
+      async function selectSubfolder() {
+
+        const folder = document.getElementById("subfolder").value;
+
+        const res = await pywebview.api.select_subfolder(folder);
+
+        if (!res.success) {
+          alert(res.error);
+        }
+      }
+
+
+      // ==================== UNIFIED SEARCH LOGIC ====================
+
+      function updateSearchPlaceholder() {
+        const type = document.getElementById("searchType").value;
+        const input = document.getElementById("searchInput");
+        const label = document.getElementById("searchInputLabel");
+
+        if (type === "ssn") {
+          input.placeholder = "277110696";
+          label.innerText = "Enter SSN";
+        } else if (type === "member_id") {
+          input.placeholder = "0072701BR";
+          label.innerText = "Enter Member ID";
+        } else if (type === "member_name") {
+          input.placeholder = "MASON ROBERT W";
+          label.innerText = "Enter Member Name";
+        }
+      }
+
+      function executeSearch() {
+        const type = document.getElementById("searchType").value;
+        const value = document.getElementById("searchInput").value.trim();
+
+        if (!value) {
+          alert("Please enter a search value.");
+          return;
+        }
+
+        if (type === "ssn") {
+          document.getElementById("ssn").value = value;
+          searchSSN();
+        } else if (type === "member_id") {
+          document.getElementById("memberId").value = value;
+          searchMemberId();
+        } else if (type === "member_name") {
+          document.getElementById("memberName").value = value;
+          searchMemberName();
+        }
+      }
+
+
+
+      // -------------------- SSN SEARCH --------------------
+
+      async function searchSSN() {
+        const box = searchResult;
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        const res = await pywebview.api.search_by_ssn(ssn.value);
+        if (!res.success) { box.innerHTML = res.error; return; }
+
+        const absentHTML = res.absent_dates && res.absent_dates.length
+          ? `
+    <div style="margin-top:14px">
+      <button class="btn-toggle" onclick="toggleAbsentDates()" id="absentBtn">
+        Show Absent Dates
       </button>
     </div>
+
+    <div id="absentSection" style="display:none;margin-top:15px">
+      <div id="absentDatesBox"></div>
+
+      <div style="margin-top:10px; display:flex; gap:10px; align-items:center; ">
+      <button onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
+
+        <span id="absentPageNumber"></span>
+        <button onclick="if(absentPage<Math.ceil(absentDatesData.length/pageSize)){absentPage++;renderAbsentDates()}">Next</button>
+      </div>
+    </div>
+  `
+          : "";
+
+        box.innerHTML = `
+    <div style="
+        background:#1E293B;
+        padding:16px;
+        border-radius:8px;
+        margin-bottom:14px;
+    ">
+
+        <div style="font-size:12px;font-weight:600;color:#A5B4FC;margin-bottom:4px;">
+          SSN
+        </div>
+
+        <div style="font-size:20px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
+          ${res.ssn}
+        </div>
+
+        <div style="font-weight:600;margin-bottom:8px;color:#C7D2FE;font-size:13px;">
+          Present On Dates
+        </div>
+
+
+  <div style="margin-bottom:14px;">
+    <div id="presentDatesContainer"></div>
+
+    <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+      <button style="color:white;" onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
+      <span id="presentPageNumber"></span>
+      <button style="color:white;" onclick="if(presentPage<Math.ceil(presentDatesData.length/pageSize)){presentPage++;renderPresentDates()}">Next</button>
+    </div>
+  </div>
+
+
+        <div style="
+          background:rgba(99,102,241,.12);
+          padding:10px 12px;
+          border-radius:6px;
+          font-size:13px;
+          line-height:1.6;
+          border-left:3px solid #6366F1;
+        ">
+          <div><b>Present From:</b> ${res.from}</div>
+          <div><b>To:</b> ${res.to}</div>
+          <div style="margin-top:4px;">
+            <b>Last Present On Date:</b> ${res.to}
+          </div>
+        </div>
+
+    </div>
+
+    ${absentHTML}
   `;
 
-  document.getElementById("rangeResult").innerHTML = `
-      <div><b>Total Unique SSNs:</b> ${currentRangeData.length}</div>
-      ${tableHTML}
-  `;
-}
+        // INIT PAGINATION DATA
+        presentDatesData = res.present_dates.slice().sort((a, b) => new Date(a) - new Date(b));
+        absentDatesData = res.absent_dates ? res.absent_dates.slice().sort((a, b) => new Date(a) - new Date(b)) : [];
+
+        presentPage = 1;
+        absentPage = 1;
+
+        renderPresentDates();
 
 
-// new elogic 13-02-2026************
 
-function resetRangeSearch(){
-    rangePage = 1;
-    renderRangeTable(rangeSSNData);
-}
+      }
 
+      // -------------------- MEMBER ID --------------------
+      async function searchMemberId() {
+        const box = searchResult;
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
 
-// new extra logic for filtering ssn in date range 13-02-2026
-function filterRangeSSN(){
+        const res = await pywebview.api.search_by_member_id(memberId.value);
+        if (!res.success) { box.innerHTML = res.error; return; }
 
-    const input = document.getElementById("rangeSearchInput").value.trim();
+        const sortedDates = res.dates
+          .slice()
+          .sort((a, b) => new Date(a) - new Date(b));
 
-    if(!input){
+        const fromDate = sortedDates[0];
+        const toDate = sortedDates[sortedDates.length - 1];
+
+        box.innerHTML = `
+      <div style="
+          background:#1E293B;
+          padding:16px;
+          border-radius:8px;
+          margin-bottom:14px;
+      ">
+
+          <div style="font-size:12px;font-weight:600;color:#22D3EE;margin-bottom:4px;">
+            Member ID
+          </div>
+
+          <div style="font-size:20px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
+            ${res.member_id}
+          </div>
+
+          <div style="font-weight:600;margin-bottom:8px;color:#67E8F9;font-size:13px;">
+            Present On Dates
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <div id="memberDatesContainer"></div>
+
+            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+              <button onclick="if(memberPage>1){memberPage--;renderMemberDates()}">Previous</button>
+              <span id="memberPageNumber"></span>
+              <button onclick="if(memberPage<Math.ceil(memberDatesData.length/pageSize)){memberPage++;renderMemberDates()}">Next</button>
+            </div>
+          </div>
+
+          <div style="
+            background:rgba(34,211,238,.12);
+            padding:10px 12px;
+            border-radius:6px;
+            font-size:13px;
+            line-height:1.6;
+            border-left:3px solid #22D3EE;
+          ">
+            <div><b>Present From:</b> ${fromDate}</div>
+            <div><b>To:</b> ${toDate}</div>
+            <div style="margin-top:4px;">
+              <b>Last Present Date:</b> ${toDate}
+            </div>
+          </div>
+
+      </div>
+    `;
+
+        // INIT PAGINATION
+        memberDatesData = sortedDates.slice();
+        memberPage = 1;
+        renderMemberDates();
+      }
+
+      // -------------------- MEMBER NAME --------------------
+
+      async function searchMemberName() {
+        const box = searchResult;
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        const res = await pywebview.api.search_by_member_name(memberName.value);
+        if (!res.success) { box.innerHTML = res.error; return; }
+
+        const sortedDates = res.dates
+          .slice()
+          .sort((a, b) => new Date(a) - new Date(b));
+
+        const fromDate = sortedDates[0];
+        const toDate = sortedDates[sortedDates.length - 1];
+
+        box.innerHTML = `
+      <div style="
+          background:#1E293B;
+          padding:16px;
+          border-radius:8px;
+          margin-bottom:14px;
+      ">
+
+          <div style="font-size:12px;font-weight:600;color:#F472B6;margin-bottom:4px;">
+            Member Name
+          </div>
+
+          <div style="font-size:18px;font-weight:700;letter-spacing:1px;margin-bottom:12px;">
+            ${res.member_name}
+          </div>
+
+          <div style="font-weight:600;margin-bottom:8px;color:#F9A8D4;font-size:13px;">
+            Present On Dates
+          </div>
+
+          <div style="margin-bottom:14px;">
+            <div id="memberNameDatesContainer"></div>
+
+            <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
+              <button onclick="if(memberNamePage>1){memberNamePage--;renderMemberNameDates()}">Previous</button>
+              <span id="memberNamePageNumber"></span>
+              <button onclick="if(memberNamePage<Math.ceil(memberNameDatesData.length/pageSize)){memberNamePage++;renderMemberNameDates()}">Next</button>
+            </div>
+          </div>
+
+          <div style="
+            background:rgba(244,114,182,.12);
+            padding:10px 12px;
+            border-radius:6px;
+            font-size:13px;
+            line-height:1.6;
+            border-left:3px solid #F472B6;
+          ">
+            <div><b>Present From:</b> ${fromDate}</div>
+            <div><b>To:</b> ${toDate}</div>
+            <div style="margin-top:4px;">
+              <b>Last Present Date:</b> ${toDate}
+            </div>
+          </div>
+
+      </div>
+    `;
+
+        // INIT PAGINATION
+        memberNameDatesData = sortedDates.slice();
+        memberNamePage = 1;
+        renderMemberNameDates();
+      }
+
+      // -------------------- DATE RANGE --------------------
+      async function searchDateRange() {
+
+        const box = rangeResult;
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        let start = startDate.value.trim();
+        let end = endDate.value.trim();
+
+        const res = await pywebview.api.search_ssns_by_date_range(start, end);
+
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
+
+        // Remove duplicates + sort
+        rangeSSNData = [...new Set(res.ssns)].sort();
+
         rangePage = 1;
+
+        if (rangeSSNData.length === 0) {
+          box.innerHTML = "<b>No SSNs found in selected date range.</b>";
+          return;
+        }
+
         renderRangeTable();
-        return;
-    }
-
-    const filtered = rangeSSNData.filter(ssn => ssn.includes(input));
-
-    rangePage = 1;
-
-    renderRangeTable(filtered);
-}
+      }
 
 
 
-// new member function for a pagination : 12-02-2026********************************************
-function renderMemberDates(){
-  const start = (memberPage - 1) * pageSize;
-  const end = start + pageSize;
-  const pageItems = memberDatesData.slice(start, end);
+      // -------------------- ABSENT DATES TOGGLE --------------------
 
-  document.getElementById("memberDatesContainer").innerHTML =
-    pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+      function toggleAbsentDates() {
+        const section = document.getElementById("absentSection");
+        const btn = document.getElementById("absentBtn");
 
-  document.getElementById("memberPageNumber").innerText =
-    `Page ${memberPage} of ${Math.ceil(memberDatesData.length / pageSize)}`;
-}
+        if (!section || !btn) return;
 
+        if (section.style.display === "none") {
+          section.style.display = "block";
+          btn.innerText = "Hide Absent Dates";
+          renderAbsentDates();
+        } else {
+          section.style.display = "none";
+          btn.innerText = "Show Absent Dates";
+        }
+      }
 
-// new member name function for a pagiantion : 12-02-2026**************************************
-function renderMemberNameDates(){
-  const start = (memberNamePage - 1) * pageSize;
-  const end = start + pageSize;
+      // -------------------- COPY CONTENT --------------------
+      function copyVisibleContent(containerId) {
 
-  const pageItems = memberNameDatesData.slice(start, end);
+        const container = document.getElementById(containerId);
+        if (!container) return;
 
-  document.getElementById("memberNameDatesContainer").innerHTML =
-    pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+        // Create range
+        const range = document.createRange();
+        range.selectNodeContents(container);
 
-  document.getElementById("memberNamePageNumber").innerText =
-    `Page ${memberNamePage} of ${Math.ceil(memberNameDatesData.length / pageSize)}`;
-}
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
 
+        try {
+          document.execCommand("copy");
+          alert("Content Copied Successfully!");
+        } catch (err) {
+          alert("Copy Failed");
+        }
 
-// new logic for pagination of dates in ssn logic : 12-02-26******************************14:27
+        selection.removeAllRanges();
+      }
 
-function renderPresentDates(){
-  const start = (presentPage - 1) * pageSize;
-  const end = start + pageSize;
-  const pageItems = presentDatesData.slice(start, end);
+      // -------------------- KEYBOARD SHORTCUTS --------------------
+      document.addEventListener("keydown", function (e) {
 
-  document.getElementById("presentDatesContainer").innerHTML =
-    pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+        // CTRL + SHIFT + C → copy Range Result
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
+          copyVisibleContent("rangeResult");
+        }
 
-  document.getElementById("presentPageNumber").innerText =
-    `Page ${presentPage} of ${Math.ceil(presentDatesData.length / pageSize)}`;
-}
+        // CTRL + SHIFT + S → copy Search Result
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+          copyVisibleContent("searchResult");
+        }
 
-function renderAbsentDates(){
-  const start = (absentPage - 1) * pageSize;
-  const end = start + pageSize;
-  const pageItems = absentDatesData.slice(start, end);
-
-  document.getElementById("absentDatesBox").innerHTML =
-    pageItems.map(d => `<span class="badge">${d}</span>`).join("");
-
-  document.getElementById("absentPageNumber").innerText =
-    `Page ${absentPage} of ${Math.ceil(absentDatesData.length / pageSize)}`;
-}
-
-// it is a old logic 13-02-2026***************************************
-
-// // -------------------- COMPANY --------------------
-// async function selectCompany(){
-//   const res = await pywebview.api.select_company(company.value);
-//   alert(res.success ? "Company selected successfully." : res.error);
-// }
-
-// it is a new logic 13-02-2026***************************************
-// -------------------- COMPANY --------------------
-async function selectCompany(){
-
-  const selectedCompany = document.getElementById("company").value;
-
-  if(!selectedCompany){
-      return;
-  }
-
-  const res = await pywebview.api.select_company(selectedCompany);
-
-  if(!res.success){
-      alert(res.error);
-      return;
-  }
-
-  // Show subfolder dropdown if folders available
-  const subWrapper = document.getElementById("subfolderWrapper");
-  const subSelect = document.getElementById("subfolder");
-
-  subSelect.innerHTML = `<option value="">All Folders (Default)</option>`;
-
-  if(res.subfolders && res.subfolders.length >= 1){
-
-      res.subfolders.forEach(folder=>{
-          subSelect.innerHTML += `<option value="${folder}">${folder}</option>`;
       });
 
-      subWrapper.style.display = "block";
 
-  } else {
-      subWrapper.style.display = "none";
-  }
-}
+    </script>
 
-async function selectSubfolder(){
+  </body>
 
-  const folder = document.getElementById("subfolder").value;
-
-  const res = await pywebview.api.select_subfolder(folder);
-
-  if(!res.success){
-      alert(res.error);
-  }
-}
-
-
-
-// new logic logic for SSN*******************************************11/02/2026*******************
-// ssn presence with absent dates hide button*****************************************************
-
-async function searchSSN(){
-  const box = searchResult;
-  box.style.display="block";
-  box.innerHTML="Searching...";
-
-  const res = await pywebview.api.search_by_ssn(ssn.value);
-  if(!res.success){box.innerHTML=res.error;return;}
-
-  // it is a old logic main wala 12-02-2026*********************************14:36*********************
-  // const absentHTML = res.absent_dates && res.absent_dates.length
-  //   ? `
-  //     <div style="margin-top:14px">
-  //       <button 
-  //         class="btn-toggle"
-  //         onclick="toggleAbsentDates()"
-  //         id="absentBtn"
-  //       >
-  //         Show Absent Dates
-  //       </button>
-  //     </div>
-
-  //     <div id="absentDatesBox" style="display:none;margin-top:10px">
-  //       ${res.absent_dates
-  //         .slice()
-  //         .sort((a,b)=> new Date(a) - new Date(b))
-  //         .map(d=>`<span class="badge">${d}</span>`)
-  //         .join("")
-  //       }
-  //     </div>
-  //   `
-  //   : "";
-
-  // new logic added here 12-02-2026****************************************14:36*************
-
-const absentHTML = res.absent_dates && res.absent_dates.length
-? `
-  <div style="margin-top:14px">
-    <button class="btn-toggle" onclick="toggleAbsentDates()" id="absentBtn">
-      Show Absent Dates
-    </button>
-  </div>
-
-  <div id="absentSection" style="display:none;margin-top:15px">
-    <div id="absentDatesBox"></div>
-
-    <div style="margin-top:10px; display:flex; gap:10px; align-items:center; ">
-    <button onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
-
-      <span id="absentPageNumber"></span>
-      <button onclick="if(absentPage<Math.ceil(absentDatesData.length/pageSize)){absentPage++;renderAbsentDates()}">Next</button>
-    </div>
-  </div>
-`
-: "";
-
- // it is a new logic for the innerHTML date 11-02-2026****************************************
-box.innerHTML = `
-  <div style="
-      background:linear-gradient(135deg,#1F2937,#111827);
-      padding:18px 20px;
-      border-radius:14px;
-      margin-bottom:18px;
-      box-shadow:0 10px 25px rgba(0,0,0,.4);
-  ">
-
-      <div style="font-size:15px;font-weight:600;color:#A5B4FC;margin-bottom:6px;">
-        SSN
-      </div>
-
-      <div style="font-size:22px;font-weight:800;letter-spacing:1px;margin-bottom:12px;">
-        ${res.ssn}
-      </div>
-
-      <div style="font-weight:600;margin-bottom:8px;color:#C7D2FE;">
-        Present On Dates
-      </div>
-
-
-<div style="margin-bottom:14px;">
-  <div id="presentDatesContainer"></div>
-
-  <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-    <button style="color:white;" onclick="if(presentPage>1){presentPage--;renderPresentDates()}">Previous</button>
-    <span id="presentPageNumber"></span>
-    <button style="color:white;" onclick="if(presentPage<Math.ceil(presentDatesData.length/pageSize)){presentPage++;renderPresentDates()}">Next</button>
-  </div>
-</div>
-
-
-      <div style="
-        background:rgba(99,102,241,.15);
-        padding:12px 14px;
-        border-radius:10px;
-        font-size:14px;
-        line-height:1.6;
-        border-left:4px solid #6366F1;
-      ">
-        <div><b>Present From:</b> ${res.from}</div>
-        <div><b>To:</b> ${res.to}</div>
-        <div style="margin-top:6px;">
-          <b> This SSN Last Present On Date:</b> ${res.to}
-        </div>
-      </div>
-
-  </div>
-
-  ${absentHTML}
-`;
-
-// new logic added here 12-02-2026**********************************14:38*******************
-
-// INIT PAGINATION DATA
-presentDatesData = res.present_dates.slice().sort((a,b)=> new Date(a)-new Date(b));
-absentDatesData = res.absent_dates ? res.absent_dates.slice().sort((a,b)=> new Date(a)-new Date(b)) : [];
-
-presentPage = 1;
-absentPage = 1;
-
-renderPresentDates();
-
-
-
-}
-
-// it is a new logic for the member id : 12-02-2026(******************************)
-async function searchMemberId(){
-  const box = searchResult;
-  box.style.display="block";
-  box.innerHTML="Searching...";
-
-  const res = await pywebview.api.search_by_member_id(memberId.value);
-  if(!res.success){box.innerHTML=res.error;return;}
-
-  const sortedDates = res.dates
-    .slice()
-    .sort((a,b)=> new Date(a) - new Date(b));
-
-  const fromDate = sortedDates[0];
-  const toDate   = sortedDates[sortedDates.length - 1];
-
-  box.innerHTML = `
-    <div style="
-        background:linear-gradient(135deg,#1F2937,#111827);
-        padding:18px 20px;
-        border-radius:14px;
-        margin-bottom:18px;
-        box-shadow:0 10px 25px rgba(0,0,0,.4);
-    ">
-
-        <div style="font-size:15px;font-weight:600;color:#22D3EE;margin-bottom:6px;">
-          Member ID
-        </div>
-
-        <div style="font-size:22px;font-weight:800;letter-spacing:1px;margin-bottom:12px;">
-          ${res.member_id}
-        </div>
-
-        <div style="font-weight:600;margin-bottom:8px;color:#67E8F9;">
-          Present On Dates
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <div id="memberDatesContainer"></div>
-
-          <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-            <button onclick="if(memberPage>1){memberPage--;renderMemberDates()}">Previous</button>
-            <span id="memberPageNumber"></span>
-            <button onclick="if(memberPage<Math.ceil(memberDatesData.length/pageSize)){memberPage++;renderMemberDates()}">Next</button>
-          </div>
-        </div>
-
-        <div style="
-          background:rgba(34,211,238,.15);
-          padding:12px 14px;
-          border-radius:10px;
-          font-size:14px;
-          line-height:1.6;
-          border-left:4px solid #22D3EE;
-        ">
-          <div><b>Present From:</b> ${fromDate}</div>
-          <div><b>To:</b> ${toDate}</div>
-          <div style="margin-top:6px;">
-            <b>Last Present Date:</b> ${toDate}
-          </div>
-        </div>
-
-    </div>
-  `;
-
-  // INIT PAGINATION
-  memberDatesData = sortedDates.slice();
-  memberPage = 1;
-  renderMemberDates();
-}
-
-// old logic : for member name :******************************************
-// // -------------------- MEMBER NAME --------------------
-// async function searchMemberName(){
-//   const box = searchResult;
-//   box.style.display="block";
-//   box.innerHTML="Searching...";
-
-//   const res = await pywebview.api.search_by_member_name(memberName.value);
-//   if(!res.success){box.innerHTML=res.error;return;}
-
-//   box.innerHTML = `
-//     <div><b>Member Name:</b> ${res.member_name}</div>
-//     ${res.dates.map(d=>`<span class="badge">${d}</span>`).join("")}
-//   `;
-// }
-
-// new logic for the member name 12-02-2026*********************************************
-
-async function searchMemberName(){
-  const box = searchResult;
-  box.style.display="block";
-  box.innerHTML="Searching...";
-
-  const res = await pywebview.api.search_by_member_name(memberName.value);
-  if(!res.success){box.innerHTML=res.error;return;}
-
-  const sortedDates = res.dates
-    .slice()
-    .sort((a,b)=> new Date(a) - new Date(b));
-
-  const fromDate = sortedDates[0];
-  const toDate   = sortedDates[sortedDates.length - 1];
-
-  box.innerHTML = `
-    <div style="
-        background:linear-gradient(135deg,#1F2937,#111827);
-        padding:18px 20px;
-        border-radius:14px;
-        margin-bottom:18px;
-        box-shadow:0 10px 25px rgba(0,0,0,.4);
-    ">
-
-        <div style="font-size:15px;font-weight:600;color:#F472B6;margin-bottom:6px;">
-          Member Name
-        </div>
-
-        <div style="font-size:20px;font-weight:800;letter-spacing:1px;margin-bottom:12px;">
-          ${res.member_name}
-        </div>
-
-        <div style="font-weight:600;margin-bottom:8px;color:#F9A8D4;">
-          Present On Dates
-        </div>
-
-        <div style="margin-bottom:14px;">
-          <div id="memberNameDatesContainer"></div>
-
-          <div style="margin-top:10px; display:flex; gap:10px; align-items:center;">
-            <button onclick="if(memberNamePage>1){memberNamePage--;renderMemberNameDates()}">Previous</button>
-            <span id="memberNamePageNumber"></span>
-            <button onclick="if(memberNamePage<Math.ceil(memberNameDatesData.length/pageSize)){memberNamePage++;renderMemberNameDates()}">Next</button>
-          </div>
-        </div>
-
-        <div style="
-          background:rgba(244,114,182,.15);
-          padding:12px 14px;
-          border-radius:10px;
-          font-size:14px;
-          line-height:1.6;
-          border-left:4px solid #F472B6;
-        ">
-          <div><b>Present From:</b> ${fromDate}</div>
-          <div><b>To:</b> ${toDate}</div>
-          <div style="margin-top:6px;">
-            <b>Last Present Date:</b> ${toDate}
-          </div>
-        </div>
-
-    </div>
-  `;
-
-  // INIT PAGINATION
-  memberNameDatesData = sortedDates.slice();
-  memberNamePage = 1;
-  renderMemberNameDates();
-}
-
-// ssn date range search with pagination and search within resultsss
-async function searchDateRange(){
-
-  const box = rangeResult;
-  box.style.display="block";
-  box.innerHTML="Searching...";
-
-  let start = startDate.value.trim();
-  let end = endDate.value.trim();
-
-  const res = await pywebview.api.search_ssns_by_date_range(start,end);
-
-  if(!res.success){
-      box.innerHTML=res.error;
-      return;
-  }
-
-  // Remove duplicates + sort
-  rangeSSNData = [...new Set(res.ssns)].sort();
-
-  rangePage = 1;
-
-  if(rangeSSNData.length === 0){
-      box.innerHTML = "<b>No SSNs found in selected date range.</b>";
-      return;
-  }
-
-  renderRangeTable();
-}
-
-
-
-function toggleMode(){
-  document.body.classList.toggle("light-mode");
-
-  const btn = document.getElementById("modeToggle");
-
-  if(document.body.classList.contains("light-mode")){
-    btn.innerText = "Switch to Dark Mode";
-  } else {
-    btn.innerText = "Switch to Light Mode";
-  }
-}
-
-// new logic 11/02/2026****************************************************
-// absent dates toggle handler****************************************
-// it it is a logic : 12-02-2026*************************12:39**************
-// function toggleAbsentDates(){
-//   const box = document.getElementById("absentDatesBox");
-//   const btn = document.getElementById("absentBtn");
-
-//   if(!box || !btn) return;
-
-//   if(box.style.display === "none"){
-//     box.style.display = "block";
-//     btn.innerText = "Hide Absent Dates";
-//   } else {
-//     box.style.display = "none";
-//     btn.innerText = "Show Absent Dates";
-//   }
-// }
-
-// it is a new logic 12-02-2026*********************************14:40********************************
-
-function toggleAbsentDates(){
-  const section = document.getElementById("absentSection");
-  const btn = document.getElementById("absentBtn");
-
-  if(!section || !btn) return;
-
-  if(section.style.display === "none"){
-    section.style.display = "block";
-    btn.innerText = "Hide Absent Dates";
-    renderAbsentDates();
-  } else {
-    section.style.display = "none";
-    btn.innerText = "Show Absent Dates";
-  }
-}
-
-// it is a new logic for the copying the particular text of the screen 13-01-2026
-function copyVisibleContent(containerId){
-
-  const container = document.getElementById(containerId);
-  if(!container) return;
-
-  // Create range
-  const range = document.createRange();
-  range.selectNodeContents(container);
-
-  const selection = window.getSelection();
-  selection.removeAllRanges();
-  selection.addRange(range);
-
-  try{
-      document.execCommand("copy");
-      alert("Content Copied Successfully!");
-  } catch(err){
-      alert("Copy Failed");
-  }
-
-  selection.removeAllRanges();
-}
-
-// it is a extra new logic for the text selection*************13-02-2026
-document.addEventListener("keydown", function(e){
-
-    // CTRL + SHIFT + C → copy Range Result
-    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c"){
-        copyVisibleContent("rangeResult");
-    }
-
-    // CTRL + SHIFT + S → copy Search Result
-    if(e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s"){
-        copyVisibleContent("searchResult");
-    }
-
-});
-
-
-</script>
-
-</body>
-</html>
+  </html>
