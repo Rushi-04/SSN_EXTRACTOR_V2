@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>834 Eligibility Search System</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: #0F172A;
+      color: #E2E8F0;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+      background: #1E293B;
+      padding: 16px 24px;
+      border-bottom: 1px solid #334155;
+    }
+
+    header h1 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #F1F5F9;
+      letter-spacing: .3px;
+    }
+
+    header p {
+      font-size: 11px;
+      color: #64748B;
+      margin-top: 2px;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px;
+    }
+
+    /* SINGLE ROW SEARCH */
+    .search-row {
+      display: flex;
+      gap: 14px;
+      align-items: flex-end;
+      margin-bottom: 24px;
+      /* removed card styles */
+    }
+
+    .search-col {
+      flex: 1;
+    }
+
+    .search-col-btn {
+      flex: 0 0 auto;
+    }
+
+    /* Force label to be single line and truncate if needed */
+    .search-col label {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* SECTION LABELS */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: #64748B;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+    }
+
+    /* FORM ELEMENTS */
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: #94A3B8;
+      margin-bottom: 4px;
+    }
+
+    select,
+    input[type="text"],
+    input:not([type="hidden"]) {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid #334155;
+      font-size: 13px;
+      background: #1E293B;
+      color: #E2E8F0;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml;utf8,<svg fill='%2394A3B8' height='16' viewBox='0 0 20 20' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M5 7l5 5 5-5z'/></svg>");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      padding-right: 32px;
+    }
+
+    select option {
+      background: #1E293B;
+      color: #E2E8F0;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: #6366F1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, .2);
+    }
+
+    input::placeholder {
+      color: #475569;
+    }
+
+    /* SPACING BETWEEN FORM ROWS */
+    .form-row {
+      margin-bottom: 14px;
+    }
+
+    /* BUTTON */
+    button {
+      padding: 9px 20px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #4F46E5;
+      color: #fff;
+      transition: background .2s;
+    }
+
+    button:hover {
+      background: #4338CA;
+    }
+
+    button.secondary {
+      background: #0F766E;
+    }
+
+    button.secondary:hover {
+      background: #115E59;
+    }
+
+    /* DIVIDER */
+    .divider {
+      border: none;
+      border-top: 1px solid #1E293B;
+      margin: 24px 0;
+    }
+
+    /* RESULT */
+    .result {
+      display: none;
+      margin-top: 18px;
+      /* removed card styles */
+    }
+
+    .result b {
+      color: #A5B4FC;
+    }
+
+    /* BADGE */
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      margin: 3px;
+      border-radius: 4px;
+      background: #312E81;
+      color: #C7D2FE;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    /* PAGE BUTTON */
+    .page-btn {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      background: #4F46E5;
+      color: #fff;
+    }
+
+    .page-btn:hover {
+      background: #4338CA;
+    }
+
+    /* TOGGLE BUTTON (absent dates) */
+    .btn-toggle {
+      padding: 7px 16px;
+      border-radius: 6px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      background: #334155;
+      color: #E2E8F0;
+    }
+
+    .btn-toggle:hover {
+      background: #475569;
+    }
+
+    /* DATE RANGE GRID */
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 18px;
+      font-size: 11px;
+      color: #475569;
+      border-top: 1px solid #1E293B;
+    }
+
+    /* SCROLLBAR */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0F172A;
+    }
+
+    /* TIMELINE SUMMARY LIST */
+    .timeline-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .timeline-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .timeline-list li:last-child {
+      border-bottom: none;
+    }
+
+    .timeline-list li b {
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .summary-success {
+      color: #4ADE80;
+    }
+
+    /* Green */
+    .summary-warning {
+      color: #FACC15;
+    }
+
+    /* Yellow */
+    .summary-danger {
+      color: #F87171;
+    }
+
+    /* Red */
+    .summary-info {
+      color: #A5B4FC;
+    }
+
+    /* Indigo */
+
+    /* SIMPLE GRID TABLE */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      border: 1px solid #475569;
+    }
+
+    th {
+      text-align: left;
+      padding: 8px;
+      font-weight: 600;
+      color: #E2E8F0;
+      background: #334155;
+      border: 1px solid #475569;
+      font-size: 12px;
+    }
+
+    td {
+      padding: 8px;
+      border: 1px solid #475569;
+      color: #CBD5E1;
+    }
+  </style>
+
+</head>
+
+<body>
+
+  <header>
+    <h1>834 Eligibility Search System</h1>
+    <!-- <p>Enterprise Enrollment Audit Tool</p> -->
+  </header>
+
+  <div class="container">
+
+    <!-- SINGLE ROW SEARCH UI -->
+    <div class="search-row">
+
+      <!-- COMPANY -->
+      <div class="search-col">
+        <label>Company</label>
+        <select id="company" onchange="selectCompany()">
+          <option value="">Select Company</option>
+          <option>AHH_AMO</option>
+          <option>ANTHEM_ABC_MUSGROW</option>
+          <option>TELADOC</option>
+          <option>SAVRX</option>
+        </select>
+      </div>
+
+      <!-- SUBFOLDER (Always Visible) -->
+      <div class="search-col" id="subfolderWrapper">
+        <label>Subfolder</label>
+        <select id="subfolder" onchange="selectSubfolder()">
+          <option value="">All Folders (Default)</option>
+        </select>
+      </div>
+
+      <!-- SEARCH TYPE -->
+      <div class="search-col">
+        <label>Search Type</label>
+        <select id="searchType" onchange="updateSearchPlaceholder()">
+          <option value="ssn">SSN</option>
+          <option value="member_id">Member ID</option>
+          <option value="member_name">Member Name</option>
+        </select>
+      </div>
+
+      <!-- SEARCH INPUT -->
+      <div class="search-col" style="flex: 1.5;">
+        <label id="searchInputLabel">Enter SSN</label>
+        <input id="searchInput" placeholder="277110696">
+      </div>
+
+      <!-- SEARCH BUTTON -->
+      <div class="search-col-btn">
+        <button onclick="executeSearch()" style="height: 38px; padding: 0 30px;">Search</button>
+      </div>
+
+    </div>
+
+    <!-- HIDDEN INPUTS (backward compatibility) -->
+    <input type="hidden" id="ssn">
+    <input type="hidden" id="memberId">
+    <input type="hidden" id="memberName">
+
+    <!-- SEARCH RESULT -->
+    <div id="searchResult" class="result"></div>
+
+    <hr class="divider">
+
+    <!-- DATE RANGE
+    <div class="section-label">Date Range → All SSNs</div>
+
+    <div class="date-grid" style="margin-bottom:14px;">
+      <div>
+        <label>Start Date (DD-MM-YYYY)</label>
+        <input id="startDate">
+      </div>
+      <div>
+        <label>End Date (DD-MM-YYYY)</label>
+        <input id="endDate">
+      </div>
+    </div>
+
+    <button class="secondary" onclick="searchDateRange()">Find SSNs</button>
+    <div id="rangeResult" class="result"></div>
+
+  </div> -->
+
+    <!-- <footer>
+    &copy; 2026 &middot; Healthcare Eligibility Automation Platform
+  </footer> -->
+
+    <script>
+
+      // new logic for pagination of dates in ssn logic : 12-02-2026****************************14:27
+      // ===== PAGINATION STATE =====
+      let presentDatesData = [];
+      let absentDatesData = [];
+
+      let presentPage = 1;
+      let absentPage = 1;
+
+      const pageSize = 10;
+
+      // new logic for member_id : 12-02-2026*********************************************************
+      let memberDatesData = [];
+      let memberPage = 1;
+
+      // new logic for member name : 12-02-2026*******************************************************
+      let memberNameDatesData = [];
+      let memberNamePage = 1;
+
+
+      // new loigc for pagination of dates in ssn range logic : 13-02-2026****************************
+      // ===== DATE RANGE PAGINATION =====
+      let rangeSSNData = [];
+      let rangePage = 1;
+      const rangePageSize = 30;
+      let currentRangeData = [];
+
+
+      // 14-02-2026
+      let ssnTablePage = 1;
+      let ssnTableData = [];
+      let ssnTableTitle = "";
+
+
+
+      // new date ssn range logic date : 13-02-2026** 13:29
+      function renderRangeTable(data = null) {
+
+        // store active dataset globally
+        currentRangeData = data ? data : rangeSSNData;
+
+        const start = (rangePage - 1) * rangePageSize;
+        const end = start + rangePageSize;
+        const pageItems = currentRangeData.slice(start, end);
+
+        let tableHTML = `
+    <div style="margin-top:20px;margin-bottom:15px;display:flex;gap:10px;flex-wrap:wrap;">
+        <input id="rangeSearchInput" 
+               placeholder="Search SSN..."
+               style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:white;font-size:14px;">
+
+        <button class="page-btn" onclick="filterRangeSSN()">
+            Search
+        </button>
+
+        <button class="page-btn" onclick="resetRangeSearch()">
+            Cancel
+        </button>
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;">
+      <thead>
+        <tr style="background:linear-gradient(135deg,#4F46E5,#7C3AED);color:white;">
+          <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">#</th>
+          <th style="padding:10px;border:1px solid rgba(255,255,255,.1);">SSN</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+        if (pageItems.length === 0) {
+          tableHTML += `
+        <tr>
+            <td colspan="2" style="padding:15px;text-align:center;">
+                No SSN Found
+            </td>
+        </tr>
+      `;
+        }
+
+        pageItems.forEach((ssn, index) => {
+          tableHTML += `
+      <tr style="text-align:center;background:rgba(255,255,255,.03);">
+        <td style="padding:8px;border:1px solid rgba(255,255,255,.08);">
+          ${start + index + 1}
+        </td>
+        <td style="padding:8px;border:1px solid rgba(255,255,255,.08);font-weight:600;">
+          ${ssn}
+        </td>
+      </tr>
+    `;
+        });
+
+        tableHTML += `
+      </tbody>
+    </table>
+
+    <div style="margin-top:15px;display:flex;justify-content:center;align-items:center;gap:15px;">
+      <button class="page-btn"
+        onclick="if(rangePage>1){rangePage--;renderRangeTable(currentRangeData);}">
+        Previous
+      </button>
+
+      <span style="font-weight:600;">
+        Page ${rangePage} of ${Math.ceil(currentRangeData.length / rangePageSize)}
+      </span>
+
+      <button class="page-btn"
+        onclick="if(rangePage<Math.ceil(currentRangeData.length/rangePageSize)){rangePage++;renderRangeTable(currentRangeData);}">
+        Next
+      </button>
+    </div>
+  `;
+
+        document.getElementById("rangeResult").innerHTML = `
+      <div><b>Total Unique SSNs:</b> ${currentRangeData.length}</div>
+      ${tableHTML}
+  `;
+      }
+
+
+      // new elogic 13-02-2026************
+
+      function resetRangeSearch() {
+        rangePage = 1;
+        renderRangeTable(rangeSSNData);
+      }
+
+
+      // new extra logic for filtering ssn in date range 13-02-2026
+      function filterRangeSSN() {
+
+        const input = document.getElementById("rangeSearchInput").value.trim();
+
+        if (!input) {
+          rangePage = 1;
+          renderRangeTable();
+          return;
+        }
+
+        const filtered = rangeSSNData.filter(ssn => ssn.includes(input));
+
+        rangePage = 1;
+
+        renderRangeTable(filtered);
+      }
+
+
+
+      // new member function for a pagination : 12-02-2026********************************************
+      function renderMemberDates() {
+        const start = (memberPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = memberDatesData.slice(start, end);
+
+        document.getElementById("memberDatesContainer").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("memberPageNumber").innerText =
+          `Page ${memberPage} of ${Math.ceil(memberDatesData.length / pageSize)}`;
+      }
+
+
+      // new member name function for a pagiantion : 12-02-2026**************************************
+      function renderMemberNameDates() {
+        const start = (memberNamePage - 1) * pageSize;
+        const end = start + pageSize;
+
+        const pageItems = memberNameDatesData.slice(start, end);
+
+        document.getElementById("memberNameDatesContainer").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("memberNamePageNumber").innerText =
+          `Page ${memberNamePage} of ${Math.ceil(memberNameDatesData.length / pageSize)}`;
+      }
+
+
+      // new logic for pagination of dates in ssn logic : 12-02-26******************************14:27
+
+      function renderPresentDates() {
+        const start = (presentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = presentDatesData.slice(start, end);
+
+        document.getElementById("presentDatesContainer").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("presentPageNumber").innerText =
+          `Page ${presentPage} of ${Math.ceil(presentDatesData.length / pageSize)}`;
+      }
+
+      function renderAbsentDates() {
+        const start = (absentPage - 1) * pageSize;
+        const end = start + pageSize;
+        const pageItems = absentDatesData.slice(start, end);
+
+        document.getElementById("absentDatesBox").innerHTML =
+          pageItems.map(d => `<span class="badge">${d}</span>`).join("");
+
+        document.getElementById("absentPageNumber").innerText =
+          `Page ${absentPage} of ${Math.ceil(absentDatesData.length / pageSize)}`;
+      }
+
+      // -------------------- COMPANY --------------------
+      async function selectCompany() {
+
+        const selectedCompany = document.getElementById("company").value;
+
+        if (!selectedCompany) return;
+
+        const res = await fetch("/select_company", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company_name: selectedCompany })
+        }).then(r => r.json());
+
+        if (!res.success) {
+          alert(res.error);
+          return;
+        }
+
+        const subSelect = document.getElementById("subfolder");
+        subSelect.innerHTML = `<option value="">All Folders (Default)</option>`;
+
+        if (res.subfolders && res.subfolders.length >= 1) {
+          res.subfolders.forEach(folder => {
+            subSelect.innerHTML += `<option value="${folder}">${folder}</option>`;
+          });
+        }
+      }
+
+      async function selectSubfolder() {
+
+        const folder = document.getElementById("subfolder").value;
+
+        const res = await fetch("/select_subfolder", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ subfolder_name: folder })
+        }).then(r => r.json());
+
+        if (!res.success) {
+          alert(res.error);
+        }
+      }
+
+
+      // ==================== UNIFIED SEARCH LOGIC ====================
+
+      function updateSearchPlaceholder() {
+        const type = document.getElementById("searchType").value;
+        const input = document.getElementById("searchInput");
+        const label = document.getElementById("searchInputLabel");
+
+        if (type === "ssn") {
+          input.placeholder = "277110696";
+          label.innerText = "Enter SSN";
+        } else if (type === "member_id") {
+          input.placeholder = "0072701BR";
+          label.innerText = "Enter Member ID";
+        } else if (type === "member_name") {
+          input.placeholder = "MASON ROBERT W";
+          label.innerText = "Enter Member Name";
+        }
+      }
+
+      function executeSearch() {
+        const type = document.getElementById("searchType").value;
+        const value = document.getElementById("searchInput").value.trim();
+
+        if (!value) {
+          alert("Please enter a search value.");
+          return;
+        }
+
+        if (type === "ssn") {
+          document.getElementById("ssn").value = value;
+          searchSSN();
+        } else if (type === "member_id") {
+          document.getElementById("memberId").value = value;
+          searchMemberId();
+        } else if (type === "member_name") {
+          document.getElementById("memberName").value = value;
+          searchMemberName();
+        }
+      }
+
+
+
+      
+
+
+      // new logic 14-02-2026**********************************************************
+      async function searchSSN() 
+      {
+
+        const box = searchResult;
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        const res = await fetch("/search_by_ssn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ssn: ssn.value })
+        }).then(r => r.json());
+
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
+
+        presentDatesData = res.present_records || [];
+        absentDatesData = res.absent_records || [];
+        window.ssnSummary = res.summary || "";
+
+        presentPage = 1;
+        absentPage = 1;
+
+        box.innerHTML = `
+          <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+            SSN: <span style="color:#A5B4FC;">${res.ssn}</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;">
+
+              <div id="absentContainer"></div>
+              <div id="presentContainer"></div>
+
+          </div>
+
+          <div style="
+              padding:14px;
+              background:rgba(99,102,241,.08);
+              border-left:4px solid #6366F1;
+              font-size:13px;
+              line-height:1.6;
+          ">
+            <div style="font-weight:700;margin-bottom:6px;color:#A5B4FC;">Conclusion</div>
+            <div>${window.ssnSummary || "No timeline summary available."}</div>
+          </div>
+        `;
+
+        renderAbsentTable();
+        renderPresentTable();
+      }
+
+
+      // -------------------- RENDER HELPERS --------------------
+
+      function renderPresentTable() {
+        renderGenericTable(presentDatesData, presentPage, "presentContainer", "Present Records", "present");
+      }
+
+      function renderAbsentTable() {
+        renderGenericTable(absentDatesData, absentPage, "absentContainer", "Absent Records", "absent");
+      }
+
+      function renderGenericTable(data, page, containerId, title, type) {
+        const pageSize = 10;
+        const start = (page - 1) * pageSize;
+        const end = start + pageSize;
+        const items = data.slice(start, end);
+        const totalPages = Math.ceil(data.length / pageSize) || 1;
+
+        let html = `
+        <div style="font-weight:600;margin-bottom:10px;color:#E2E8F0;font-size:14px;">
+            ${title} <span style="font-weight:400;color:#64748B;font-size:12px;margin-left:5px;">(${data.length})</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th style="width:40px;">#</th>
+              <th>Date</th>
+              <th>Filename</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+        if (items.length === 0) {
+          html += `<tr><td colspan="3" style="padding:15px;text-align:center;color:#64748B;">No Records Found</td></tr>`;
+        } else {
+          items.forEach((row, index) => {
+            html += `
+              <tr>
+                <td>${start + index + 1}</td>
+                <td>${row.date || "-"}</td>
+                <td>${row.filename || "-"}</td>
+              </tr>
+            `;
+          });
+        }
+
+        html += `</tbody></table>`;
+
+        // Pagination
+        if (totalPages > 1) {
+          const prevFn = type === 'present'
+            ? "if(presentPage>1){presentPage--;renderPresentTable()}"
+            : "if(absentPage>1){absentPage--;renderAbsentTable()}";
+
+          const nextFn = type === 'present'
+            ? `if(presentPage<${totalPages}){presentPage++;renderPresentTable()}`
+            : `if(absentPage<${totalPages}){absentPage++;renderAbsentTable()}`;
+
+          html += `
+            <div style="margin-top:10px;display:flex;justify-content:center;gap:10px;align-items:center;">
+                <button class="page-btn" onclick="${prevFn}">Prev</button>
+                <span style="font-size:12px;">${page} / ${totalPages}</span>
+                <button class="page-btn" onclick="${nextFn}">Next</button>
+            </div>
+        `;
+        }
+
+        const container = document.getElementById(containerId);
+        if (container) container.innerHTML = html;
+      }
+
+
+      // new logic time 14-02-2026 : 19:53
+
+      // new logic time 14-02-2026 : 19:53
+
+      async function searchMemberId() {
+
+        const box = document.getElementById("searchResult");
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        const res = await fetch("/search_by_member_id", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ member_id: memberId.value })
+        }).then(r => r.json());
+
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
+
+        presentDatesData = res.present_records || [];
+        absentDatesData = res.absent_records || [];
+        window.memberSummary = res.summary || "";
+
+        presentPage = 1;
+        absentPage = 1;
+
+        box.innerHTML = `
+          <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+            Member ID: <span style="color:#22D3EE;">${res.member_id}</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;">
+              <div id="absentContainer"></div>
+              <div id="presentContainer"></div>
+          </div>
+
+          <div style="
+              padding:14px;
+              background:rgba(34,211,238,.08);
+              border-left:4px solid #22D3EE;
+              font-size:13px;
+              line-height:1.6;
+          ">
+            <div style="font-weight:700;margin-bottom:6px;color:#22D3EE;">Conclusion</div>
+            <div>${window.memberSummary || "No timeline summary available."}</div>
+          </div>
+        `;
+
+        renderAbsentTable();
+        renderPresentTable();
+      }
+
+
+
+
+
+
+
+
+
+      // -------------------- MEMBER NAME --------------------
+      async function searchMemberName() 
+      {
+
+        const box = document.getElementById("searchResult");
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        const res = await fetch("/search_by_member_name", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ member_name: memberName.value })
+        }).then(r => r.json());
+
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
+
+        presentDatesData = res.present_records || [];
+        absentDatesData = res.absent_records || [];
+
+        presentPage = 1;
+        absentPage = 1;
+
+        box.innerHTML = `
+          <div style="font-size:20px;font-weight:700;margin-bottom:20px;">
+            Member Name: <span style="color:#F472B6;">${res.member_name}</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 30px;">
+              <div id="absentContainer"></div>
+              <div id="presentContainer"></div>
+          </div>
+        `;
+
+        renderAbsentTable();
+        renderPresentTable();
+      }
+
+
+      // -------------------- DATE RANGE --------------------
+      async function searchDateRange() 
+      {
+
+        const box = rangeResult;
+        box.style.display = "block";
+        box.innerHTML = "Searching...";
+
+        let start = startDate.value.trim();
+        let end = endDate.value.trim();
+
+        const res = await fetch("/search_ssns_by_date_range", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ start_date: start, end_date: end })
+        }).then(r => r.json());
+
+        if (!res.success) {
+          box.innerHTML = res.error;
+          return;
+        }
+
+        rangeSSNData = [...new Set(res.ssns)].sort();
+        rangePage = 1;
+
+        if (rangeSSNData.length === 0) {
+          box.innerHTML = "<b>No SSNs found in selected date range.</b>";
+          return;
+        }
+
+        renderRangeTable();
+      }
+
+
+
+      // -------------------- ABSENT DATES TOGGLE --------------------
+
+      function toggleAbsentDates() {
+        const section = document.getElementById("absentSection");
+        const btn = document.getElementById("absentBtn");
+
+        if (!section || !btn) return;
+
+        if (section.style.display === "none") {
+          section.style.display = "block";
+          btn.innerText = "Hide Absent Dates";
+          renderAbsentDates();
+        } else {
+          section.style.display = "none";
+          btn.innerText = "Show Absent Dates";
+        }
+      }
+
+      // -------------------- COPY CONTENT --------------------
+      function copyVisibleContent(containerId) {
+
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Create range
+        const range = document.createRange();
+        range.selectNodeContents(container);
+
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        try {
+          document.execCommand("copy");
+          alert("Content Copied Successfully!");
+        } catch (err) {
+          alert("Copy Failed");
+        }
+
+        selection.removeAllRanges();
+      }
+
+      // -------------------- KEYBOARD SHORTCUTS --------------------
+      document.addEventListener("keydown", function (e) {
+
+        // CTRL + SHIFT + C → copy Range Result
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
+          copyVisibleContent("rangeResult");
+        }
+
+        // CTRL + SHIFT + S → copy Search Result
+        if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "s") {
+          copyVisibleContent("searchResult");
+        }
+
+      });
+
+
+    </script>
+
+</body>
+
+</html>
